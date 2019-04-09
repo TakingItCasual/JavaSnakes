@@ -1,4 +1,4 @@
-package com.JavaSnake.util;
+package com.JavaSnakes.util;
 
 public class GridPos {
 

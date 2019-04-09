@@ -1,10 +1,10 @@
-package com.JavaSnake;
+package com.JavaSnakes;
 
-import com.JavaSnake.Snakes.PlayerSnake;
-import com.JavaSnake.Snakes.SnakeBase;
-import com.JavaSnake.util.Direction;
-import com.JavaSnake.util.MapCell;
-import com.JavaSnake.util.GridPos;
+import com.JavaSnakes.Snakes.PlayerSnake;
+import com.JavaSnakes.Snakes.SnakeBase;
+import com.JavaSnakes.util.Direction;
+import com.JavaSnakes.util.MapCell;
+import com.JavaSnakes.util.GridPos;
 
 import java.awt.Color;
 import java.awt.Dimension;

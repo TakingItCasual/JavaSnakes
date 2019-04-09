@@ -1,11 +1,11 @@
-package com.JavaSnake.Snakes;
+package com.JavaSnakes.Snakes;
 
 import java.awt.Color;
 import java.util.LinkedList;
 import java.util.stream.IntStream;
 
-import com.JavaSnake.util.Direction;
-import com.JavaSnake.util.GridPos;
+import com.JavaSnakes.util.Direction;
+import com.JavaSnakes.util.GridPos;
 
 public abstract class SnakeBase {
 

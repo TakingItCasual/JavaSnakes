@@ -1,4 +1,4 @@
-package com.JavaSnake;
+package com.JavaSnakes;
 
 import java.awt.EventQueue;
 import javax.swing.JFrame;
