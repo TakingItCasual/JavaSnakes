@@ -66,11 +66,11 @@ public class GameMap extends JPanel implements ActionListener {
 
         this.snakes = new ArrayList<>();
         snakes.add(new PlayerSnake(
-            Direction.Right, new GridPos(5, 5), Color.blue,
+            Direction.Right, new GridPos(3, 3), Color.blue,
             KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT
         ));
         snakes.add(new PlayerSnake(
-            Direction.Left, new GridPos(mapW - 5, mapH - 5), Color.cyan,
+            Direction.Left, new GridPos(mapW - 4, mapH - 4), Color.cyan,
             KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D
         ));
 
@@ -94,17 +94,17 @@ public class GameMap extends JPanel implements ActionListener {
             g.setColor(Color.red);
             g.fillRect(food.x * CELL_SIZE + 1, food.y * CELL_SIZE + 1, 8, 8);
 
-            // Draw player snakes
-            for (SnakeBase player_snake : snakes) {
-                if (player_snake.status == Status.Dead) continue;
+            // Draw snakes
+            for (SnakeBase snake : snakes) {
+                if (snake.status == Status.Dead) continue;
 
-                g.setColor(player_snake.color);
+                g.setColor(snake.color);
                 g.fillRect(
-                    player_snake.coords.getFirst().x * CELL_SIZE,
-                    player_snake.coords.getFirst().y * CELL_SIZE,
+                    snake.coords.getFirst().x * CELL_SIZE,
+                    snake.coords.getFirst().y * CELL_SIZE,
                     10, 10
                 );
-                for (Iterator<GridPos> iter = player_snake.coords.listIterator(1); iter.hasNext(); ) {
+                for (Iterator<GridPos> iter = snake.coords.listIterator(1); iter.hasNext(); ) {
                     GridPos coord = iter.next();
                     g.fillRect(coord.x * CELL_SIZE + 1, coord.y * CELL_SIZE + 1, 8, 8);
                 }
