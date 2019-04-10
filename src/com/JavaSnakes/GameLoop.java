@@ -90,40 +90,47 @@ public class GameLoop extends JPanel implements ActionListener {
     
     private void doDrawing(Graphics g) {
         if (inGame) {
-            // Draw food
-            g.setColor(Color.red);
-            g.fillRect(food.x * CELL_SIZE + 1, food.y * CELL_SIZE + 1, 8, 8);
-
-            // Draw snakes
-            for (SnakeBase snake : snakes) {
-                if (snake.status == Status.Dead) continue;
-
-                g.setColor(snake.color);
-                g.fillRect(
-                    snake.coords.getFirst().x * CELL_SIZE,
-                    snake.coords.getFirst().y * CELL_SIZE,
-                    10, 10
-                );
-                for (Iterator<GridPos> iter = snake.coords.listIterator(1); iter.hasNext(); ) {
-                    GridPos coord = iter.next();
-                    g.fillRect(coord.x * CELL_SIZE + 1, coord.y * CELL_SIZE + 1, 8, 8);
-                }
-            }
-
-            // Draw walls
-            g.setColor(Color.black);
-            for (int x = 0; x < mapW; x++) {
-                for (int y = 0; y < mapH; y++) {
-                    if (gameMap.get(x).get(y) == MapCell.Wall) {
-                        g.fillRect(x * CELL_SIZE, y * CELL_SIZE, 10, 10);
-                    }
-                }
-            }
+            drawFood(g);
+            drawSnakes(g);
+            drawWalls(g);
 
             Toolkit.getDefaultToolkit().sync();
         } else {
             gameOver(g);
         }        
+    }
+
+    private void drawFood(Graphics g) {
+        g.setColor(Color.red);
+        g.fillRect(food.x * CELL_SIZE + 1, food.y * CELL_SIZE + 1, 8, 8);
+    }
+
+    private void drawSnakes(Graphics g) {
+        for (SnakeBase snake : snakes) {
+            if (snake.status == Status.Dead) continue;
+
+            g.setColor(snake.color);
+            g.fillRect(
+                snake.coords.getFirst().x * CELL_SIZE,
+                snake.coords.getFirst().y * CELL_SIZE,
+                10, 10
+            );
+            for (Iterator<GridPos> iter = snake.coords.listIterator(1); iter.hasNext(); ) {
+                GridPos coord = iter.next();
+                g.fillRect(coord.x * CELL_SIZE + 1, coord.y * CELL_SIZE + 1, 8, 8);
+            }
+        }
+    }
+
+    private void drawWalls(Graphics g) {
+        g.setColor(Color.black);
+        for (int x = 0; x < mapW; x++) {
+            for (int y = 0; y < mapH; y++) {
+                if (gameMap.get(x).get(y) == MapCell.Wall) {
+                    g.fillRect(x * CELL_SIZE, y * CELL_SIZE, 10, 10);
+                }
+            }
+        }
     }
 
     private void gameOver(Graphics g) {
@@ -141,21 +148,8 @@ public class GameLoop extends JPanel implements ActionListener {
             SnakeBase this_snake = snakes.get(i);
             if (this_snake.status == Status.Dead) continue;
 
-            // Collision with wall
-            if (gameMap.get(this_snake.coords.getFirst().x).get(this_snake.coords.getFirst().y) == MapCell.Wall)
+            if (wallCollided(this_snake) || tailCollided(this_snake) || snakeCollided(this_snake, i)) {
                 this_snake.status = Status.Dying;
-            // Collision with own tail
-            if (Collections.frequency(this_snake.coords, this_snake.coords.getFirst()) > 1)
-                this_snake.status = Status.Dying;
-
-            for (int i2 = 0; i2 < snakes.size(); i2++) {
-                SnakeBase other_snake = snakes.get(i2);
-                if (i == i2 || other_snake.status == Status.Dead) continue;
-
-                // Collision with other snake
-                if (other_snake.coords.contains(this_snake.coords.getFirst())) {
-                    this_snake.status = Status.Dying;
-                }
             }
         }
 
@@ -167,6 +161,32 @@ public class GameLoop extends JPanel implements ActionListener {
             inGame = false;
             timer.stop();
         }
+    }
+
+    private boolean wallCollided(SnakeBase snake) {
+        if (gameMap.get(snake.coords.getFirst().x).get(snake.coords.getFirst().y) == MapCell.Wall) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean tailCollided(SnakeBase snake) {
+        if (Collections.frequency(snake.coords, snake.coords.getFirst()) > 1) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean snakeCollided(SnakeBase this_snake, int snake_num) {
+        for (int other_snake_num = 0; other_snake_num < snakes.size(); other_snake_num++) {
+            SnakeBase other_snake = snakes.get(other_snake_num);
+            if (snake_num == other_snake_num || other_snake.status == Status.Dead) continue;
+
+            if (other_snake.coords.contains(this_snake.coords.getFirst())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean areAllDead() {
