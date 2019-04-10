@@ -50,8 +50,6 @@ public abstract class SnakeBase {
     }
 
     public void moveHead() {
-        if (status == status.Dead) return;
-
         GridPos prev_head = coords.getFirst();
 
         if (direction == Direction.Up) {
@@ -66,16 +64,12 @@ public abstract class SnakeBase {
     }
 
     public void removeTailEnd() {
-        if (status == Status.Dead) return;
-
         while (coords.size() > length) {
             coords.removeLast();
         }
     }
 
     public void feed() {
-        if (status == Status.Dead) return;
-
         length += 1;
         score += 1;
     }

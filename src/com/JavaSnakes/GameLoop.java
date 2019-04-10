@@ -13,8 +13,6 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -23,23 +21,23 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.swing.JPanel;
-import javax.swing.Timer;
 
-public class GameLoop extends JPanel implements ActionListener {
+public class GameLoop extends JPanel implements Runnable {
 
     private final int CELL_SIZE = 10;
-    private final int DELAY = 140;
+    private final int DELAY = 170;
 
     private int mapW;
     private int mapH;
     private List<List<MapCell>> gameMap;
+
     private List<SnakeBase> snakes;
+    private List<SnakeBase> live_snakes;
 
     private GridPos food;
 
-    private boolean inGame = true;
-
-    private Timer timer;
+    private boolean inGame;
+    private Thread animator;
 
     public GameLoop() {
         addKeyListener(new Input());
@@ -73,31 +71,30 @@ public class GameLoop extends JPanel implements ActionListener {
             Direction.Left, new GridPos(mapW - 4, mapH - 4), Color.cyan,
             KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D
         ));
+        this.live_snakes = new ArrayList<>(snakes);
 
         this.food = new GridPos(0, 0);
         createFood();
 
-        this.timer = new Timer(DELAY, this);
-        timer.start();
+        this.inGame = true;
+        this.animator = new Thread(this);
+        animator.start();
     }
 
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        doDrawing(g);
-    }
-    
-    private void doDrawing(Graphics g) {
         if (inGame) {
             drawFood(g);
             drawSnakes(g);
             drawWalls(g);
-
-            Toolkit.getDefaultToolkit().sync();
         } else {
-            gameOver(g);
-        }        
+            drawGameOver(g);
+        }
+
+        Toolkit.getDefaultToolkit().sync();
+        g.dispose();
     }
 
     private void drawFood(Graphics g) {
@@ -106,9 +103,7 @@ public class GameLoop extends JPanel implements ActionListener {
     }
 
     private void drawSnakes(Graphics g) {
-        for (SnakeBase snake : snakes) {
-            if (snake.status == Status.Dead) continue;
-
+        for (SnakeBase snake : live_snakes) {
             g.setColor(snake.color);
             g.fillRect(
                 snake.coords.getFirst().x * CELL_SIZE,
@@ -133,33 +128,22 @@ public class GameLoop extends JPanel implements ActionListener {
         }
     }
 
-    private void gameOver(Graphics g) {
+    private void drawGameOver(Graphics g) {
         String msg = "Game Over";
         Font small = new Font("Helvetica", Font.BOLD, 14);
         FontMetrics metr = getFontMetrics(small);
 
         g.setColor(Color.white);
         g.setFont(small);
-        g.drawString(msg, (mapW *CELL_SIZE - metr.stringWidth(msg)) / 2, mapH *CELL_SIZE / 2);
+        g.drawString(msg, (mapW * CELL_SIZE - metr.stringWidth(msg)) / 2, mapH * CELL_SIZE / 2);
     }
 
     private void checkCollisions() {
-        for (int i = 0; i < snakes.size(); i++) {
-            SnakeBase this_snake = snakes.get(i);
-            if (this_snake.status == Status.Dead) continue;
-
+        for (int i = 0; i < live_snakes.size(); i++) {
+            SnakeBase this_snake = live_snakes.get(i);
             if (wallCollided(this_snake) || tailCollided(this_snake) || snakeCollided(this_snake, i)) {
-                this_snake.status = Status.Dying;
+                this_snake.status = Status.Collided;
             }
-        }
-
-        for (SnakeBase snake : snakes) {
-            if (snake.status == Status.Dying) snake.status = Status.Dead;
-        }
-
-        if (areAllDead()) {
-            inGame = false;
-            timer.stop();
         }
     }
 
@@ -170,6 +154,7 @@ public class GameLoop extends JPanel implements ActionListener {
         return false;
     }
 
+    // Checks if snake has collided with its own tail
     private boolean tailCollided(SnakeBase snake) {
         if (Collections.frequency(snake.coords, snake.coords.getFirst()) > 1) {
             return true;
@@ -177,10 +162,11 @@ public class GameLoop extends JPanel implements ActionListener {
         return false;
     }
 
+    // Checks if snake has collided with another snake
     private boolean snakeCollided(SnakeBase this_snake, int snake_num) {
-        for (int other_snake_num = 0; other_snake_num < snakes.size(); other_snake_num++) {
-            SnakeBase other_snake = snakes.get(other_snake_num);
-            if (snake_num == other_snake_num || other_snake.status == Status.Dead) continue;
+        for (int other_snake_num = 0; other_snake_num < live_snakes.size(); other_snake_num++) {
+            SnakeBase other_snake = live_snakes.get(other_snake_num);
+            if (snake_num == other_snake_num) continue;
 
             if (other_snake.coords.contains(this_snake.coords.getFirst())) {
                 return true;
@@ -189,15 +175,19 @@ public class GameLoop extends JPanel implements ActionListener {
         return false;
     }
 
-    private boolean areAllDead() {
-        for (SnakeBase snake : snakes) if (snake.status != Status.Dead) return false;
-        return true;
+    private void killCollidedSnakes() {
+        for(Iterator<SnakeBase> iter = live_snakes.iterator(); iter.hasNext(); ) {
+            SnakeBase snake = iter.next();
+            if (snake.status == Status.Collided){
+                snake.status = Status.Dead;
+                iter.remove();
+            }
+        }
     }
 
     private void checkFood() {
-        for (SnakeBase snake : snakes) {
-            if (snake.status == Status.Dead) return;
-            if (snake.coords.getFirst().x == food.x && snake.coords.getFirst().y == food.y) {
+        for (SnakeBase snake : live_snakes) {
+            if (snake.coords.getFirst().equals(food)) {
                 snake.feed();
                 createFood();
             }
@@ -205,28 +195,62 @@ public class GameLoop extends JPanel implements ActionListener {
     }
 
     private void createFood() {
+        boolean empty_space;
         do {
+            empty_space = true;
             food.x = ThreadLocalRandom.current().nextInt(0, mapW);
             food.y = ThreadLocalRandom.current().nextInt(0, mapH);
-        } while (gameMap.get(food.x).get(food.y) != MapCell.Empty);
+
+            if (gameMap.get(food.x).get(food.y) != MapCell.Empty) {
+                empty_space = false;
+                continue;
+            }
+            for (SnakeBase snake : live_snakes) {
+                if (snake.coords.contains(food)){
+                    empty_space = false;
+                    break;
+                }
+            }
+        } while (!empty_space);
+    }
+
+    private void gameLogic() {
+        for (SnakeBase snake : live_snakes)
+            snake.processDirection();
+        for (SnakeBase snake : live_snakes)
+            snake.moveHead();
+
+        checkCollisions();
+        killCollidedSnakes();
+        if (live_snakes.size() == 0) inGame = false;
+        checkFood();
+
+        for (SnakeBase snake : live_snakes)
+            snake.removeTailEnd();
+
+        paintImmediately(getBounds());
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        if (inGame) {
-            for (SnakeBase snake : snakes)
-                snake.processDirection();
-            for (SnakeBase snake : snakes)
-                snake.moveHead();
+    public void run() {
+        long beforeTime, timeDiff, sleep;
+        beforeTime = System.currentTimeMillis();
 
-            checkCollisions();
-            checkFood();
+        while (inGame) {
+            gameLogic();
 
-            for (SnakeBase snake : snakes)
-                snake.removeTailEnd();
+            timeDiff = System.currentTimeMillis() - beforeTime;
+            sleep = DELAY - timeDiff;
+            if (sleep < 0) sleep = 2;
+
+            try {
+                Thread.sleep(sleep);
+            } catch (InterruptedException e) {
+                System.out.println("interrupted");
+            }
+
+            beforeTime = System.currentTimeMillis();
         }
-
-        paintImmediately(getBounds());
     }
 
     private class Input extends KeyAdapter {
@@ -235,7 +259,7 @@ public class GameLoop extends JPanel implements ActionListener {
         public void keyPressed(KeyEvent e) {
             int key = e.getKeyCode();
 
-            for (SnakeBase snake : snakes) {
+            for (SnakeBase snake : live_snakes) {
                 if (!(snake instanceof PlayerSnake)) continue;
                 PlayerSnake player_snake = (PlayerSnake) snake;
 

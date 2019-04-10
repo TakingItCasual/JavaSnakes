@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 import com.JavaSnakes.util.Direction;
 import com.JavaSnakes.util.GridPos;
-import com.JavaSnakes.util.Status;
 
 public class PlayerSnake extends SnakeBase {
 
@@ -35,8 +34,6 @@ public class PlayerSnake extends SnakeBase {
     }
 
     public void processDirection() {
-        if (status == Status.Dead) return;
-
         if (direction == Direction.Up && directionBuffer != Direction.Down) {
             direction = directionBuffer;
         } else if (direction == Direction.Down && directionBuffer != Direction.Up) {
