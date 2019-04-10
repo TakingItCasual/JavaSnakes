@@ -25,7 +25,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class GameMap extends JPanel implements ActionListener {
+public class GameLoop extends JPanel implements ActionListener {
 
     private final int CELL_SIZE = 10;
     private final int DELAY = 140;
@@ -41,7 +41,7 @@ public class GameMap extends JPanel implements ActionListener {
 
     private Timer timer;
 
-    public GameMap() {
+    public GameLoop() {
         addKeyListener(new Input());
         setBackground(Color.darkGray);
         setFocusable(true);

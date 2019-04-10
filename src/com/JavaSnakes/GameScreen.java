@@ -6,7 +6,7 @@ import javax.swing.JFrame;
 public class GameScreen extends JFrame {
 
     public GameScreen() {
-        add(new GameMap());
+        add(new GameLoop());
 
         setResizable(false);
         pack();
