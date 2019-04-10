@@ -5,9 +5,11 @@ import java.util.HashMap;
 
 import com.JavaSnakes.util.Direction;
 import com.JavaSnakes.util.GridPos;
+import com.JavaSnakes.util.Status;
 
 public class PlayerSnake extends SnakeBase {
 
+    public Direction direction_buffer;
     public HashMap<Integer, Direction> ctrlKeys;
 
     public PlayerSnake(
@@ -21,7 +23,9 @@ public class PlayerSnake extends SnakeBase {
     ) {
         super(setDirection, initPos, setColor);
 
-        ctrlKeys = new HashMap<>();
+        this.direction_buffer = setDirection;
+
+        this.ctrlKeys = new HashMap<>();
         ctrlKeys.put(ctrlUp, Direction.Up);
         ctrlKeys.put(ctrlDown, Direction.Down);
         ctrlKeys.put(ctrlLeft, Direction.Left);
@@ -31,17 +35,17 @@ public class PlayerSnake extends SnakeBase {
     }
 
     public void process_input() {
-        if (!alive) return;
+        if (status == Status.Dead) return;
 
         if (direction == Direction.Up && direction_buffer != Direction.Down) {
-            this.direction = direction_buffer;
+            direction = direction_buffer;
         } else if (direction == Direction.Down && direction_buffer != Direction.Up) {
-            this.direction = direction_buffer;
+            direction = direction_buffer;
         } else if (direction == Direction.Left && direction_buffer != Direction.Right) {
-            this.direction = direction_buffer;
+            direction = direction_buffer;
         } else if (direction == Direction.Right && direction_buffer != Direction.Left) {
-            this.direction = direction_buffer;
+            direction = direction_buffer;
         }
-        this.direction_buffer = direction;
+        direction_buffer = direction;
     }
 }
