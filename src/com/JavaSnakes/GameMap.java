@@ -1,6 +1,7 @@
 package com.JavaSnakes;
 
 import com.JavaSnakes.Snakes.PlayerSnake;
+import com.JavaSnakes.Snakes.SnakeBase;
 import com.JavaSnakes.util.Direction;
 import com.JavaSnakes.util.GridPos;
 import com.JavaSnakes.util.MapCell;
@@ -29,10 +30,10 @@ public class GameMap extends JPanel implements ActionListener {
     private final int CELL_SIZE = 10;
     private final int DELAY = 140;
 
-    private int map_w;
-    private int map_h;
-    private List<List<MapCell>> game_map;
-    private List<PlayerSnake> player_snakes;
+    private int mapW;
+    private int mapH;
+    private List<List<MapCell>> gameMap;
+    private List<SnakeBase> snakes;
 
     private GridPos food;
 
@@ -45,32 +46,31 @@ public class GameMap extends JPanel implements ActionListener {
         setBackground(Color.darkGray);
         setFocusable(true);
 
-        this.map_w = this.map_h = 30;
-        setPreferredSize(new Dimension(map_w*CELL_SIZE, map_h*CELL_SIZE));
+        this.mapW = this.mapH = 15;
+        setPreferredSize(new Dimension(mapW * CELL_SIZE, mapH * CELL_SIZE));
         initGame();
     }
 
     private void initGame() {
-
-        this.game_map = new ArrayList<>();
-        for (int _x = 0; _x < map_w; _x++) {
-            game_map.add(new ArrayList<>());
-            for (int _y = 0; _y < map_h; _y++) {
-                if (_x == 0 || _x == map_w-1 || _y == 0 || _y == map_h-1) {
-                    game_map.get(_x).add(MapCell.Wall);
+        this.gameMap = new ArrayList<>();
+        for (int x = 0; x < mapW; x++) {
+            gameMap.add(new ArrayList<>());
+            for (int y = 0; y < mapH; y++) {
+                if (x == 0 || x == mapW - 1 || y == 0 || y == mapH - 1) {
+                    gameMap.get(x).add(MapCell.Wall);
                 } else {
-                    game_map.get(_x).add(MapCell.Empty);
+                    gameMap.get(x).add(MapCell.Empty);
                 }
             }
         }
 
-        this.player_snakes = new ArrayList<>();
-        player_snakes.add(new PlayerSnake(
+        this.snakes = new ArrayList<>();
+        snakes.add(new PlayerSnake(
             Direction.Right, new GridPos(5, 5), Color.blue,
             KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT
         ));
-        player_snakes.add(new PlayerSnake(
-            Direction.Left, new GridPos(20, 20), Color.cyan,
+        snakes.add(new PlayerSnake(
+            Direction.Left, new GridPos(mapW - 5, mapH - 5), Color.cyan,
             KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D
         ));
 
@@ -95,7 +95,7 @@ public class GameMap extends JPanel implements ActionListener {
             g.fillRect(food.x * CELL_SIZE + 1, food.y * CELL_SIZE + 1, 8, 8);
 
             // Draw player snakes
-            for (PlayerSnake player_snake : player_snakes) {
+            for (SnakeBase player_snake : snakes) {
                 if (player_snake.status == Status.Dead) continue;
 
                 g.setColor(player_snake.color);
@@ -112,10 +112,10 @@ public class GameMap extends JPanel implements ActionListener {
 
             // Draw walls
             g.setColor(Color.black);
-            for (int _x = 0; _x < map_w; _x++) {
-                for (int _y = 0; _y < map_h; _y++) {
-                    if (game_map.get(_x).get(_y) == MapCell.Wall) {
-                        g.fillRect(_x * CELL_SIZE, _y * CELL_SIZE, 10, 10);
+            for (int x = 0; x < mapW; x++) {
+                for (int y = 0; y < mapH; y++) {
+                    if (gameMap.get(x).get(y) == MapCell.Wall) {
+                        g.fillRect(x * CELL_SIZE, y * CELL_SIZE, 10, 10);
                     }
                 }
             }
@@ -133,52 +133,52 @@ public class GameMap extends JPanel implements ActionListener {
 
         g.setColor(Color.white);
         g.setFont(small);
-        g.drawString(msg, (map_w*CELL_SIZE - metr.stringWidth(msg)) / 2, map_h*CELL_SIZE / 2);
+        g.drawString(msg, (mapW *CELL_SIZE - metr.stringWidth(msg)) / 2, mapH *CELL_SIZE / 2);
     }
 
-    private void check_collisions() {
-        for (int i = 0; i < player_snakes.size(); i++) {
-            PlayerSnake player_snake = player_snakes.get(i);
-            if (player_snake.status == Status.Dead) continue;
+    private void checkCollisions() {
+        for (int i = 0; i < snakes.size(); i++) {
+            SnakeBase this_snake = snakes.get(i);
+            if (this_snake.status == Status.Dead) continue;
 
             // Collision with wall
-            if (game_map.get(player_snake.coords.getFirst().x).get(player_snake.coords.getFirst().y) == MapCell.Wall)
-                player_snake.status = Status.Dying;
+            if (gameMap.get(this_snake.coords.getFirst().x).get(this_snake.coords.getFirst().y) == MapCell.Wall)
+                this_snake.status = Status.Dying;
             // Collision with own tail
-            if (Collections.frequency(player_snake.coords, player_snake.coords.getFirst()) > 1)
-                player_snake.status = Status.Dying;
+            if (Collections.frequency(this_snake.coords, this_snake.coords.getFirst()) > 1)
+                this_snake.status = Status.Dying;
 
-            for (int i2 = 0; i2 < player_snakes.size(); i2++) {
-                PlayerSnake other_snake = player_snakes.get(i2);
+            for (int i2 = 0; i2 < snakes.size(); i2++) {
+                SnakeBase other_snake = snakes.get(i2);
                 if (i == i2 || other_snake.status == Status.Dead) continue;
 
                 // Collision with other snake
-                if (other_snake.coords.contains(player_snake.coords.getFirst())) {
-                    player_snake.status = Status.Dying;
+                if (other_snake.coords.contains(this_snake.coords.getFirst())) {
+                    this_snake.status = Status.Dying;
                 }
             }
         }
 
-        for (PlayerSnake player_snake : player_snakes) {
-            if (player_snake.status == Status.Dying) player_snake.status = Status.Dead;
+        for (SnakeBase snake : snakes) {
+            if (snake.status == Status.Dying) snake.status = Status.Dead;
         }
 
-        if (isAllDead()) {
+        if (areAllDead()) {
             inGame = false;
             timer.stop();
         }
     }
 
-    private boolean isAllDead() {
-        for (PlayerSnake player_snake : player_snakes) if (player_snake.status != Status.Dead) return false;
+    private boolean areAllDead() {
+        for (SnakeBase snake : snakes) if (snake.status != Status.Dead) return false;
         return true;
     }
 
-    private void check_food() {
-        for (PlayerSnake player_snake : player_snakes) {
-            if (player_snake.status == Status.Dead) return;
-            if (player_snake.coords.getFirst().x == food.x && player_snake.coords.getFirst().y == food.y) {
-                player_snake.feed();
+    private void checkFood() {
+        for (SnakeBase snake : snakes) {
+            if (snake.status == Status.Dead) return;
+            if (snake.coords.getFirst().x == food.x && snake.coords.getFirst().y == food.y) {
+                snake.feed();
                 createFood();
             }
         }
@@ -186,24 +186,24 @@ public class GameMap extends JPanel implements ActionListener {
 
     private void createFood() {
         do {
-            food.x = ThreadLocalRandom.current().nextInt(0, map_w);
-            food.y = ThreadLocalRandom.current().nextInt(0, map_h);
-        } while (game_map.get(food.x).get(food.y) != MapCell.Empty);
+            food.x = ThreadLocalRandom.current().nextInt(0, mapW);
+            food.y = ThreadLocalRandom.current().nextInt(0, mapH);
+        } while (gameMap.get(food.x).get(food.y) != MapCell.Empty);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (inGame) {
-            for (PlayerSnake player_snake : player_snakes)
-                player_snake.process_input();
-            for (PlayerSnake player_snake : player_snakes)
-                player_snake.move_head();
+            for (SnakeBase snake : snakes)
+                snake.processDirection();
+            for (SnakeBase snake : snakes)
+                snake.moveHead();
 
-            check_collisions();
-            check_food();
+            checkCollisions();
+            checkFood();
 
-            for (PlayerSnake player_snake : player_snakes)
-                player_snake.remove_tail_end();
+            for (SnakeBase snake : snakes)
+                snake.removeTailEnd();
         }
 
         paintImmediately(getBounds());
@@ -215,9 +215,12 @@ public class GameMap extends JPanel implements ActionListener {
         public void keyPressed(KeyEvent e) {
             int key = e.getKeyCode();
 
-            for (PlayerSnake player_snake : player_snakes) {
+            for (SnakeBase snake : snakes) {
+                if (!(snake instanceof PlayerSnake)) continue;
+                PlayerSnake player_snake = (PlayerSnake) snake;
+
                 if (player_snake.ctrlKeys.containsKey(key)) {
-                    player_snake.direction_buffer = player_snake.ctrlKeys.get(key);
+                    player_snake.directionBuffer = player_snake.ctrlKeys.get(key);
                 }
             }
         }

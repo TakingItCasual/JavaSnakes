@@ -49,7 +49,7 @@ public abstract class SnakeBase {
         this.score = 0;
     }
 
-    public void move_head() {
+    public void moveHead() {
         if (status == status.Dead) return;
 
         GridPos prev_head = coords.getFirst();
@@ -65,7 +65,7 @@ public abstract class SnakeBase {
         }
     }
 
-    public void remove_tail_end() {
+    public void removeTailEnd() {
         if (status == Status.Dead) return;
 
         while (coords.size() > length) {
@@ -79,4 +79,6 @@ public abstract class SnakeBase {
         length += 1;
         score += 1;
     }
+
+    public abstract void processDirection();
 }

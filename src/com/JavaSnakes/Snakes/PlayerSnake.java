@@ -9,7 +9,7 @@ import com.JavaSnakes.util.Status;
 
 public class PlayerSnake extends SnakeBase {
 
-    public Direction direction_buffer;
+    public Direction directionBuffer;
     public HashMap<Integer, Direction> ctrlKeys;
 
     public PlayerSnake(
@@ -23,7 +23,7 @@ public class PlayerSnake extends SnakeBase {
     ) {
         super(setDirection, initPos, setColor);
 
-        this.direction_buffer = setDirection;
+        this.directionBuffer = setDirection;
 
         this.ctrlKeys = new HashMap<>();
         ctrlKeys.put(ctrlUp, Direction.Up);
@@ -34,18 +34,18 @@ public class PlayerSnake extends SnakeBase {
         if (ctrlKeys.size() != 4) System.exit(1); // TODO: Properly handle duplicate control keys
     }
 
-    public void process_input() {
+    public void processDirection() {
         if (status == Status.Dead) return;
 
-        if (direction == Direction.Up && direction_buffer != Direction.Down) {
-            direction = direction_buffer;
-        } else if (direction == Direction.Down && direction_buffer != Direction.Up) {
-            direction = direction_buffer;
-        } else if (direction == Direction.Left && direction_buffer != Direction.Right) {
-            direction = direction_buffer;
-        } else if (direction == Direction.Right && direction_buffer != Direction.Left) {
-            direction = direction_buffer;
+        if (direction == Direction.Up && directionBuffer != Direction.Down) {
+            direction = directionBuffer;
+        } else if (direction == Direction.Down && directionBuffer != Direction.Up) {
+            direction = directionBuffer;
+        } else if (direction == Direction.Left && directionBuffer != Direction.Right) {
+            direction = directionBuffer;
+        } else if (direction == Direction.Right && directionBuffer != Direction.Left) {
+            direction = directionBuffer;
         }
-        direction_buffer = direction;
+        directionBuffer = direction;
     }
 }
