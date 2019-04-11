@@ -68,9 +68,7 @@ public abstract class SnakeBase implements Commons {
     }
 
     public boolean selfCollided() {
-        if (Collections.frequency(coords, coords.getFirst()) > 1) {
-            return true;
-        }
+        if (Collections.frequency(coords, coords.getFirst()) > 1) return true;
         return false;
     }
 
