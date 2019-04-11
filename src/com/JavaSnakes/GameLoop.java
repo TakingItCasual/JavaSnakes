@@ -4,9 +4,10 @@ import com.JavaSnakes.Snakes.PlayerSnake;
 import com.JavaSnakes.Snakes.SnakeBase;
 import com.JavaSnakes.util.Direction;
 import com.JavaSnakes.util.GridPos;
-import com.JavaSnakes.util.MapCell;
+import com.JavaSnakes.util.MapData;
 import com.JavaSnakes.util.Status;
 
+import javax.swing.JPanel;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -19,16 +20,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import javax.swing.JPanel;
 
-public class GameLoop extends JPanel implements Runnable, Commons {
+public class GameLoop extends JPanel implements Runnable {
 
-    private boolean[][] mapWalls = new boolean[MAP_W][MAP_H];
+    int CELL_SIZE = 10;
+    int DELAY = 150;
+
+    private MapData mapData;
 
     private List<SnakeBase> snakes;
-    private List<SnakeBase> live_snakes;
-
-    private GridPos food;
+    private List<SnakeBase> liveSnakes;
 
     private boolean inGame;
     private Thread animator;
@@ -38,33 +39,34 @@ public class GameLoop extends JPanel implements Runnable, Commons {
         setBackground(Color.darkGray);
         setFocusable(true);
 
-        setPreferredSize(new Dimension(MAP_W * CELL_SIZE, MAP_H * CELL_SIZE));
+        this.mapData = new MapData(15, 15);
+
+        setPreferredSize(new Dimension(mapData.width * CELL_SIZE, mapData.height * CELL_SIZE));
         initGame(false);
     }
 
     private void initGame(boolean includeWalls) {
-        for (int x = 0; x < MAP_W; x++) {
-            for (int y = 0; y < Commons.MAP_H; y++) {
+        for (int x = 0; x < mapData.width; x++) {
+            for (int y = 0; y < mapData.height; y++) {
                 if (includeWalls) {
-                    mapWalls[x][y] = (x == 0 || x == MAP_W - 1 || y == 0 || y == MAP_H - 1);
+                    mapData.walls[x][y] = (x == 0 || x == mapData.width - 1 || y == 0 || y == mapData.height - 1);
                 } else {
-                    mapWalls[x][y] = false;
+                    mapData.walls[x][y] = false;
                 }
             }
         }
 
         this.snakes = new ArrayList<>();
         snakes.add(new PlayerSnake(
-            Direction.Right, new GridPos(3, 3), Color.blue,
+            mapData, Direction.Right, new GridPos(3, 3), Color.blue,
             KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT
         ));
         snakes.add(new PlayerSnake(
-            Direction.Left, new GridPos(MAP_W - 4, MAP_H - 4), Color.cyan,
+            mapData, Direction.Left, new GridPos(mapData.width - 4, mapData.height - 4), Color.cyan,
             KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D
         ));
-        this.live_snakes = new ArrayList<>(snakes);
+        this.liveSnakes = new ArrayList<>(snakes);
 
-        this.food = new GridPos(0, 0);
         createFood();
 
         this.inGame = true;
@@ -85,17 +87,17 @@ public class GameLoop extends JPanel implements Runnable, Commons {
     }
 
     private void gameLogic() {
-        for (SnakeBase snake : live_snakes)
+        for (SnakeBase snake : liveSnakes)
             snake.processDirection();
-        for (SnakeBase snake : live_snakes)
+        for (SnakeBase snake : liveSnakes)
             snake.moveHead();
 
         checkCollisions();
         killCollidedSnakes();
-        if (live_snakes.size() == 0) inGame = false;
+        if (liveSnakes.size() == 0) inGame = false;
         checkFood();
 
-        for (SnakeBase snake : live_snakes)
+        for (SnakeBase snake : liveSnakes)
             snake.removeTailEnd();
     }
 
@@ -126,11 +128,11 @@ public class GameLoop extends JPanel implements Runnable, Commons {
 
     private void drawFood(Graphics g) {
         g.setColor(Color.red);
-        g.fillRect(food.x * CELL_SIZE + 1, food.y * CELL_SIZE + 1, 8, 8);
+        g.fillRect(mapData.food.x * CELL_SIZE + 1, mapData.food.y * CELL_SIZE + 1, 8, 8);
     }
 
     private void drawSnakes(Graphics g) {
-        for (SnakeBase snake : live_snakes) {
+        for (SnakeBase snake : liveSnakes) {
             g.setColor(snake.color);
 
             GridPos coord = snake.coords.getFirst();
@@ -144,9 +146,9 @@ public class GameLoop extends JPanel implements Runnable, Commons {
 
     private void drawWalls(Graphics g) {
         g.setColor(Color.black);
-        for (int x = 0; x < MAP_W; x++) {
-            for (int y = 0; y < MAP_H; y++) {
-                if (mapWalls[x][y]) {
+        for (int x = 0; x < mapData.width; x++) {
+            for (int y = 0; y < mapData.height; y++) {
+                if (mapData.walls[x][y]) {
                     g.fillRect(x * CELL_SIZE, y * CELL_SIZE, 10, 10);
                 }
             }
@@ -160,29 +162,29 @@ public class GameLoop extends JPanel implements Runnable, Commons {
 
         g.setColor(Color.white);
         g.setFont(small);
-        g.drawString(msg, (MAP_W * CELL_SIZE - metr.stringWidth(msg)) / 2, MAP_H * CELL_SIZE / 2);
+        g.drawString(msg, (mapData.width * CELL_SIZE - metr.stringWidth(msg)) / 2, mapData.height * CELL_SIZE / 2);
     }
 
     private void checkCollisions() {
-        for (int i = 0; i < live_snakes.size(); i++) {
-            SnakeBase this_snake = live_snakes.get(i);
-            if (wallCollided(this_snake) || this_snake.selfCollided() || snakeCollided(this_snake, i)) {
-                this_snake.status = Status.Collided;
+        for (int i = 0; i < liveSnakes.size(); i++) {
+            SnakeBase thisSnake = liveSnakes.get(i);
+            if (wallCollided(thisSnake) || thisSnake.selfCollided() || snakeCollided(thisSnake, i)) {
+                thisSnake.status = Status.Collided;
             }
         }
     }
 
     private boolean wallCollided(SnakeBase snake) {
-        if (mapWalls[snake.coords.getFirst().x][snake.coords.getFirst().y]) return true;
+        if (mapData.walls[snake.coords.getFirst().x][snake.coords.getFirst().y]) return true;
         return false;
     }
 
-    private boolean snakeCollided(SnakeBase this_snake, int snake_num) {
-        for (int other_snake_num = 0; other_snake_num < live_snakes.size(); other_snake_num++) {
-            SnakeBase other_snake = live_snakes.get(other_snake_num);
-            if (snake_num == other_snake_num) continue;
+    private boolean snakeCollided(SnakeBase thisSnake, int snakeNum) {
+        for (int otherSnakeNum = 0; otherSnakeNum < liveSnakes.size(); otherSnakeNum++) {
+            SnakeBase otherSnake = liveSnakes.get(otherSnakeNum);
+            if (snakeNum == otherSnakeNum) continue;
 
-            if (other_snake.coords.contains(this_snake.coords.getFirst())) {
+            if (otherSnake.coords.contains(thisSnake.coords.getFirst())) {
                 return true;
             }
         }
@@ -190,7 +192,7 @@ public class GameLoop extends JPanel implements Runnable, Commons {
     }
 
     private void killCollidedSnakes() {
-        for(Iterator<SnakeBase> iter = live_snakes.iterator(); iter.hasNext(); ) {
+        for(Iterator<SnakeBase> iter = liveSnakes.iterator(); iter.hasNext(); ) {
             SnakeBase snake = iter.next();
             if (snake.status == Status.Collided){
                 snake.status = Status.Dead;
@@ -200,8 +202,8 @@ public class GameLoop extends JPanel implements Runnable, Commons {
     }
 
     private void checkFood() {
-        for (SnakeBase snake : live_snakes) {
-            if (snake.coords.getFirst().equals(food)) {
+        for (SnakeBase snake : liveSnakes) {
+            if (snake.coords.getFirst().equals(mapData.food)) {
                 snake.feed();
                 createFood();
             }
@@ -209,23 +211,23 @@ public class GameLoop extends JPanel implements Runnable, Commons {
     }
 
     private void createFood() {
-        boolean empty_space;
+        boolean emptySpace;
         do {
-            empty_space = true;
-            food.x = ThreadLocalRandom.current().nextInt(0, MAP_W);
-            food.y = ThreadLocalRandom.current().nextInt(0, MAP_H);
+            emptySpace = true;
+            mapData.food.x = ThreadLocalRandom.current().nextInt(0, mapData.width);
+            mapData.food.y = ThreadLocalRandom.current().nextInt(0, mapData.height);
 
-            if (mapWalls[food.x][food.y]) {
-                empty_space = false;
+            if (mapData.walls[mapData.food.x][mapData.food.y]) {
+                emptySpace = false;
                 continue;
             }
-            for (SnakeBase snake : live_snakes) {
-                if (snake.coords.contains(food)){
-                    empty_space = false;
+            for (SnakeBase snake : liveSnakes) {
+                if (snake.coords.contains(mapData.food)){
+                    emptySpace = false;
                     break;
                 }
             }
-        } while (!empty_space);
+        } while (!emptySpace);
     }
 
     private class Input extends KeyAdapter {
@@ -234,12 +236,12 @@ public class GameLoop extends JPanel implements Runnable, Commons {
         public void keyPressed(KeyEvent e) {
             int key = e.getKeyCode();
 
-            for (SnakeBase snake : live_snakes) {
+            for (SnakeBase snake : liveSnakes) {
                 if (!(snake instanceof PlayerSnake)) continue;
-                PlayerSnake player_snake = (PlayerSnake) snake;
+                PlayerSnake playerSnake = (PlayerSnake) snake;
 
-                if (player_snake.ctrlKeys.containsKey(key)) {
-                    player_snake.directionBuffer = player_snake.ctrlKeys.get(key);
+                if (playerSnake.ctrlKeys.containsKey(key)) {
+                    playerSnake.directionBuffer = playerSnake.ctrlKeys.get(key);
                 }
             }
         }

@@ -1,19 +1,18 @@
 package com.JavaSnakes.Snakes;
 
+import com.JavaSnakes.util.Direction;
+import com.JavaSnakes.util.GridPos;
+import com.JavaSnakes.util.MapData;
+import com.JavaSnakes.util.Status;
+
 import java.awt.Color;
 import java.util.Collections;
 import java.util.LinkedList;
 
-import com.JavaSnakes.Commons;
-import com.JavaSnakes.util.Direction;
-import com.JavaSnakes.util.GridPos;
-import com.JavaSnakes.util.Status;
-
-public abstract class SnakeBase implements Commons {
+public abstract class SnakeBase {
 
     private static int initLength = 3;
-
-    public Color color;
+    private MapData mapData;
 
     public Status status;
     protected Direction direction;
@@ -21,7 +20,11 @@ public abstract class SnakeBase implements Commons {
     protected int length;
     protected int score;
 
-    SnakeBase(Direction setDirection, GridPos initPos, Color setColor) {
+    public Color color;
+
+    SnakeBase(MapData setMapaData, Direction setDirection, GridPos initPos, Color setColor) {
+        this.mapData = setMapaData;
+
         this.status = Status.Alive;
         this.direction = setDirection;
 
@@ -48,10 +51,10 @@ public abstract class SnakeBase implements Commons {
         if (direction == Direction.Left) newHead.x -= 1;
         if (direction == Direction.Right) newHead.x += 1;
 
-        if (newHead.x < 0) newHead.x = MAP_W - 1;
-        if (newHead.x >= MAP_W) newHead.x = 0;
-        if (newHead.y < 0) newHead.y = MAP_H - 1;
-        if (newHead.y >= MAP_H) newHead.y = 0;
+        if (newHead.x < 0) newHead.x = mapData.width - 1;
+        if (newHead.x >= mapData.width) newHead.x = 0;
+        if (newHead.y < 0) newHead.y = mapData.height - 1;
+        if (newHead.y >= mapData.height) newHead.y = 0;
 
         coords.addFirst(newHead);
     }

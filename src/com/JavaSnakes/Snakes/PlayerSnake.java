@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import com.JavaSnakes.util.Direction;
 import com.JavaSnakes.util.GridPos;
+import com.JavaSnakes.util.MapData;
 
 public class PlayerSnake extends SnakeBase {
 
@@ -12,6 +13,7 @@ public class PlayerSnake extends SnakeBase {
     public HashMap<Integer, Direction> ctrlKeys;
 
     public PlayerSnake(
+            MapData setMapData,
             Direction setDirection,
             GridPos initPos,
             Color setColor,
@@ -20,7 +22,7 @@ public class PlayerSnake extends SnakeBase {
             int ctrlLeft,
             int ctrlRight
     ) {
-        super(setDirection, initPos, setColor);
+        super(setMapData, setDirection, initPos, setColor);
 
         this.directionBuffer = setDirection;
 

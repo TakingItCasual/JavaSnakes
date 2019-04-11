@@ -4,11 +4,12 @@ import java.awt.Color;
 
 import com.JavaSnakes.util.Direction;
 import com.JavaSnakes.util.GridPos;
+import com.JavaSnakes.util.MapData;
 
 public class BotSnake extends SnakeBase {
 
-    public BotSnake(Direction setDirection, GridPos initPos, Color setColor) {
-        super(setDirection, initPos, setColor);
+    public BotSnake(MapData setMapData, Direction setDirection, GridPos initPos, Color setColor) {
+        super(setMapData, setDirection, initPos, setColor);
     }
 
     public void processDirection() {}
