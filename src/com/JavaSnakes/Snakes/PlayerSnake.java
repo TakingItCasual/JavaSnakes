@@ -34,13 +34,11 @@ public class PlayerSnake extends SnakeBase {
     }
 
     public void processDirection() {
-        if (direction == Direction.Up && directionBuffer != Direction.Down) {
-            direction = directionBuffer;
-        } else if (direction == Direction.Down && directionBuffer != Direction.Up) {
-            direction = directionBuffer;
-        } else if (direction == Direction.Left && directionBuffer != Direction.Right) {
-            direction = directionBuffer;
-        } else if (direction == Direction.Right && directionBuffer != Direction.Left) {
+        if ((direction == Direction.Up && directionBuffer != Direction.Down) ||
+            (direction == Direction.Down && directionBuffer != Direction.Up) ||
+            (direction == Direction.Left && directionBuffer != Direction.Right) ||
+            (direction == Direction.Right && directionBuffer != Direction.Left))
+        {
             direction = directionBuffer;
         }
         directionBuffer = direction;

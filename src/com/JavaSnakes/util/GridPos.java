@@ -10,6 +10,11 @@ public class GridPos {
         this.y = setY;
     }
 
+    public GridPos(GridPos other) {
+        this.x = other.x;
+        this.y = other.y;
+    }
+
     @Override
     public boolean equals(Object o){
         if (this == o) return true;

@@ -1,14 +1,15 @@
 package com.JavaSnakes.Snakes;
 
 import java.awt.Color;
+import java.util.Collections;
 import java.util.LinkedList;
-import java.util.stream.IntStream;
 
+import com.JavaSnakes.Commons;
 import com.JavaSnakes.util.Direction;
 import com.JavaSnakes.util.GridPos;
 import com.JavaSnakes.util.Status;
 
-public abstract class SnakeBase {
+public abstract class SnakeBase implements Commons {
 
     private static int initLength = 3;
 
@@ -25,22 +26,12 @@ public abstract class SnakeBase {
         this.direction = setDirection;
 
         this.coords = new LinkedList<>();
-        if (direction == Direction.Up) {
-            IntStream.range(0, initLength).forEachOrdered(n -> {
-                coords.addLast(new GridPos(initPos.x, initPos.y + n));
-            });
-        } else if (direction == Direction.Down) {
-            IntStream.range(0, initLength).forEachOrdered(n -> {
-                coords.addLast(new GridPos(initPos.x, initPos.y - n));
-            });
-        } else if (direction == Direction.Left) {
-            IntStream.range(0, initLength).forEachOrdered(n -> {
-                coords.addLast(new GridPos(initPos.x + n, initPos.y));
-            });
-        } else if (direction == Direction.Right) {
-            IntStream.range(0, initLength).forEachOrdered(n -> {
-                coords.addLast(new GridPos(initPos.x - n, initPos.y));
-            });
+        for (int i = 0; i < initLength; i++) {
+            coords.addLast(new GridPos(initPos.x, initPos.y));
+            if (direction == Direction.Up) initPos.y += 1;
+            if (direction == Direction.Down) initPos.y -= 1;
+            if (direction == Direction.Left) initPos.x += 1;
+            if (direction == Direction.Right) initPos.x -= 1;
         }
 
         this.color = setColor;
@@ -50,17 +41,19 @@ public abstract class SnakeBase {
     }
 
     public void moveHead() {
-        GridPos prev_head = coords.getFirst();
+        GridPos newHead = new GridPos(coords.getFirst());
 
-        if (direction == Direction.Up) {
-            coords.addFirst(new GridPos(prev_head.x, prev_head.y - 1));
-        } else if (direction == Direction.Down) {
-            coords.addFirst(new GridPos(prev_head.x, prev_head.y + 1));
-        } else if (direction == Direction.Left) {
-            coords.addFirst(new GridPos(prev_head.x - 1, prev_head.y));
-        } else if (direction == Direction.Right) {
-            coords.addFirst(new GridPos(prev_head.x + 1, prev_head.y));
-        }
+        if (direction == Direction.Up) newHead.y -= 1;
+        if (direction == Direction.Down) newHead.y += 1;
+        if (direction == Direction.Left) newHead.x -= 1;
+        if (direction == Direction.Right) newHead.x += 1;
+
+        if (newHead.x < 0) newHead.x = MAP_W - 1;
+        if (newHead.x >= MAP_W) newHead.x = 0;
+        if (newHead.y < 0) newHead.y = MAP_H - 1;
+        if (newHead.y >= MAP_H) newHead.y = 0;
+
+        coords.addFirst(newHead);
     }
 
     public void removeTailEnd() {
@@ -72,6 +65,13 @@ public abstract class SnakeBase {
     public void feed() {
         length += 1;
         score += 1;
+    }
+
+    public boolean selfCollided() {
+        if (Collections.frequency(coords, coords.getFirst()) > 1) {
+            return true;
+        }
+        return false;
     }
 
     public abstract void processDirection();
