@@ -105,13 +105,11 @@ public class GameLoop extends JPanel implements Runnable {
     private void drawSnakes(Graphics g) {
         for (SnakeBase snake : live_snakes) {
             g.setColor(snake.color);
-            g.fillRect(
-                snake.coords.getFirst().x * CELL_SIZE,
-                snake.coords.getFirst().y * CELL_SIZE,
-                10, 10
-            );
+
+            GridPos coord = snake.coords.getFirst();
+            g.fillRect(coord.x * CELL_SIZE, coord.y * CELL_SIZE, 10, 10);
             for (Iterator<GridPos> iter = snake.coords.listIterator(1); iter.hasNext(); ) {
-                GridPos coord = iter.next();
+                coord = iter.next();
                 g.fillRect(coord.x * CELL_SIZE + 1, coord.y * CELL_SIZE + 1, 8, 8);
             }
         }
