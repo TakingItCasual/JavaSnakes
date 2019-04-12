@@ -1,15 +1,19 @@
 package com.JavaSnakes.Snakes;
 
+import com.JavaSnakes.MapData;
 import com.JavaSnakes.util.Direction;
 import com.JavaSnakes.util.GridPos;
-import com.JavaSnakes.util.MapData;
 import com.JavaSnakes.util.Status;
 
 import java.awt.Color;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class SnakeBase {
+
+    private static final AtomicInteger NEXT_ID = new AtomicInteger(1);
+    public final int id;
 
     private static int initLength = 3;
     private MapData mapData;
@@ -18,12 +22,14 @@ public abstract class SnakeBase {
     protected Direction direction;
     public LinkedList<GridPos> coords;
     protected int length;
-    protected int score;
+    public int score;
 
     public Color color;
 
-    SnakeBase(MapData setMapaData, Direction setDirection, GridPos initPos, Color setColor) {
-        this.mapData = setMapaData;
+    SnakeBase(MapData setMapData, Direction setDirection, GridPos initPos, Color setColor) {
+        this.id = NEXT_ID.getAndIncrement();
+
+        this.mapData = setMapData;
 
         this.status = Status.Alive;
         this.direction = setDirection;

@@ -4,7 +4,7 @@ import com.JavaSnakes.Snakes.PlayerSnake;
 import com.JavaSnakes.Snakes.SnakeBase;
 import com.JavaSnakes.util.Direction;
 import com.JavaSnakes.util.GridPos;
-import com.JavaSnakes.util.MapData;
+import com.JavaSnakes.util.MapCell;
 import com.JavaSnakes.util.Status;
 
 import javax.swing.JPanel;
@@ -46,12 +46,12 @@ public class GameLoop extends JPanel implements Runnable {
     }
 
     private void initGame(boolean includeWalls) {
-        for (int x = 0; x < mapData.width; x++) {
-            for (int y = 0; y < mapData.height; y++) {
-                if (includeWalls) {
-                    mapData.walls[x][y] = (x == 0 || x == mapData.width - 1 || y == 0 || y == mapData.height - 1);
-                } else {
-                    mapData.walls[x][y] = false;
+        if (includeWalls) {
+            for (int x = 0; x < mapData.width; x++) {
+                for (int y = 0; y < mapData.height; y++) {
+                    if (x == 0 || x == mapData.width - 1 || y == 0 || y == mapData.height - 1) {
+                        mapData.cells[x][y] = MapCell.Wall;
+                    }
                 }
             }
         }
@@ -148,7 +148,7 @@ public class GameLoop extends JPanel implements Runnable {
         g.setColor(Color.black);
         for (int x = 0; x < mapData.width; x++) {
             for (int y = 0; y < mapData.height; y++) {
-                if (mapData.walls[x][y]) {
+                if (mapData.cells[x][y] == MapCell.Wall) {
                     g.fillRect(x * CELL_SIZE, y * CELL_SIZE, 10, 10);
                 }
             }
@@ -156,13 +156,26 @@ public class GameLoop extends JPanel implements Runnable {
     }
 
     private void drawGameOver(Graphics g) {
-        String msg = "Game Over";
         Font small = new Font("Helvetica", Font.BOLD, 14);
         FontMetrics metr = getFontMetrics(small);
 
         g.setColor(Color.white);
         g.setFont(small);
-        g.drawString(msg, (mapData.width * CELL_SIZE - metr.stringWidth(msg)) / 2, mapData.height * CELL_SIZE / 2);
+
+        String[] msgs = new String[snakes.size() + 1];
+        msgs[0] = "Game Over";
+        for (int i = 0; i < snakes.size(); i++) {
+            msgs[i + 1] = "Snake " + snakes.get(i).id + ": " + snakes.get(i).score;
+        }
+
+        int yOffset = g.getFontMetrics().getHeight() * (snakes.size() / 2);
+        for (int i = 0; i < msgs.length; i++) {
+            g.drawString(
+                msgs[i],
+                (getWidth() - metr.stringWidth(msgs[i])) / 2,
+                getHeight() / 2 - yOffset + i * g.getFontMetrics().getHeight()
+            );
+        }
     }
 
     private void checkCollisions() {
@@ -175,7 +188,7 @@ public class GameLoop extends JPanel implements Runnable {
     }
 
     private boolean wallCollided(SnakeBase snake) {
-        if (mapData.walls[snake.coords.getFirst().x][snake.coords.getFirst().y]) return true;
+        if (mapData.getCell(snake.coords.getFirst()) == MapCell.Wall) return true;
         return false;
     }
 
@@ -217,7 +230,7 @@ public class GameLoop extends JPanel implements Runnable {
             mapData.food.x = ThreadLocalRandom.current().nextInt(0, mapData.width);
             mapData.food.y = ThreadLocalRandom.current().nextInt(0, mapData.height);
 
-            if (mapData.walls[mapData.food.x][mapData.food.y]) {
+            if (mapData.getCell(mapData.food) == MapCell.Wall) {
                 emptySpace = false;
                 continue;
             }
@@ -235,6 +248,9 @@ public class GameLoop extends JPanel implements Runnable {
         @Override
         public void keyPressed(KeyEvent e) {
             int key = e.getKeyCode();
+
+            if (key == KeyEvent.VK_ESCAPE)
+                System.exit(0);
 
             for (SnakeBase snake : liveSnakes) {
                 if (!(snake instanceof PlayerSnake)) continue;

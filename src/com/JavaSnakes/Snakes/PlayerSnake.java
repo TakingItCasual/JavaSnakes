@@ -3,9 +3,9 @@ package com.JavaSnakes.Snakes;
 import java.awt.Color;
 import java.util.HashMap;
 
+import com.JavaSnakes.MapData;
 import com.JavaSnakes.util.Direction;
 import com.JavaSnakes.util.GridPos;
-import com.JavaSnakes.util.MapData;
 
 public class PlayerSnake extends SnakeBase {
 
