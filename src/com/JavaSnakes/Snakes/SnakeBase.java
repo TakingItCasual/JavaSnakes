@@ -16,7 +16,7 @@ public abstract class SnakeBase {
     public final int id;
 
     private static int initLength = 3;
-    private MapData mapData;
+    public static MapData mapData;
 
     public Status status;
     protected Direction direction;
@@ -26,10 +26,8 @@ public abstract class SnakeBase {
 
     public Color color;
 
-    SnakeBase(MapData setMapData, Direction setDirection, GridPos initPos, Color setColor) {
+    SnakeBase(Direction setDirection, GridPos initPos, Color setColor) {
         this.id = NEXT_ID.getAndIncrement();
-
-        this.mapData = setMapData;
 
         this.status = Status.Alive;
         this.direction = setDirection;
@@ -77,8 +75,7 @@ public abstract class SnakeBase {
     }
 
     public boolean selfCollided() {
-        if (Collections.frequency(coords, coords.getFirst()) > 1) return true;
-        return false;
+        return Collections.frequency(coords, coords.getFirst()) > 1;
     }
 
     public abstract void processDirection();

@@ -5,6 +5,10 @@ public class GridPos {
     public int x;
     public int y;
 
+    public GridPos() {
+        this(0, 0);
+    }
+
     public GridPos(int setX, int setY) {
         this.x = setX;
         this.y = setY;

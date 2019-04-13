@@ -3,7 +3,6 @@ package com.JavaSnakes.Snakes;
 import java.awt.Color;
 import java.util.HashMap;
 
-import com.JavaSnakes.MapData;
 import com.JavaSnakes.util.Direction;
 import com.JavaSnakes.util.GridPos;
 
@@ -13,7 +12,6 @@ public class PlayerSnake extends SnakeBase {
     public HashMap<Integer, Direction> ctrlKeys;
 
     public PlayerSnake(
-            MapData setMapData,
             Direction setDirection,
             GridPos initPos,
             Color setColor,
@@ -22,7 +20,7 @@ public class PlayerSnake extends SnakeBase {
             int ctrlLeft,
             int ctrlRight
     ) {
-        super(setMapData, setDirection, initPos, setColor);
+        super(setDirection, initPos, setColor);
 
         this.directionBuffer = setDirection;
 
