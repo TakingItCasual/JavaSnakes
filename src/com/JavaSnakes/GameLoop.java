@@ -22,7 +22,7 @@ public class GameLoop extends JPanel implements Runnable {
     private static final int CELL_SIZE = 10;
     private static final int DELAY = 150;
 
-    private MapData mapData;
+    private Board board;
 
     private boolean inGame;
     private Thread animator;
@@ -32,35 +32,35 @@ public class GameLoop extends JPanel implements Runnable {
         setBackground(Color.darkGray);
         setFocusable(true);
 
-        this.mapData = new MapData(30, 30);
-        SnakeBase.mapData = mapData;
+        this.board = new Board(30, 30);
+        SnakeBase.board = board;
 
-        setPreferredSize(new Dimension(mapData.width * CELL_SIZE, mapData.height * CELL_SIZE));
+        setPreferredSize(new Dimension(board.width * CELL_SIZE, board.height * CELL_SIZE));
         initGame(true);
     }
 
     private void initGame(boolean includeWalls) {
         if (includeWalls) {
-            for (int x = 0; x < mapData.width; x++) {
-                for (int y = 0; y < mapData.height; y++) {
-                    mapData.walls[x][y] = (x == 0 || x == mapData.width - 1 || y == 0 || y == mapData.height - 1);
+            for (int x = 0; x < board.width; x++) {
+                for (int y = 0; y < board.height; y++) {
+                    board.walls[x][y] = (x == 0 || x == board.width - 1 || y == 0 || y == board.height - 1);
                 }
             }
         }
 
-        mapData.createFood();
+        board.createFood();
 
-        mapData.snakes.add(new PlayerSnake(
+        board.snakes.add(new PlayerSnake(
             Direction.Right, new GridPos(3, 3), Color.blue,
             KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT
         ));
-        mapData.snakes.add(new PlayerSnake(
-            Direction.Left, new GridPos(mapData.width - 4, mapData.height - 4), Color.cyan,
+        board.snakes.add(new PlayerSnake(
+            Direction.Left, new GridPos(board.width - 4, board.height - 4), Color.cyan,
             KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D
         ));
-        mapData.snakes.add(new BotSnake(Direction.Down, new GridPos(mapData.width - 4, 3), Color.yellow));
-        mapData.snakes.add(new BotSnake(Direction.Up, new GridPos(3, mapData.height - 4), Color.green));
-        mapData.liveSnakes.addAll(mapData.snakes);
+        board.snakes.add(new BotSnake(Direction.Down, new GridPos(board.width - 4, 3), Color.yellow));
+        board.snakes.add(new BotSnake(Direction.Up, new GridPos(3, board.height - 4), Color.green));
+        board.liveSnakes.addAll(board.snakes);
 
         this.inGame = true;
         this.animator = new Thread(this);
@@ -80,17 +80,17 @@ public class GameLoop extends JPanel implements Runnable {
     }
 
     private void gameLogic() {
-        for (SnakeBase snake : mapData.liveSnakes)
+        for (SnakeBase snake : board.liveSnakes)
             snake.processDirection();
-        for (SnakeBase snake : mapData.liveSnakes)
+        for (SnakeBase snake : board.liveSnakes)
             snake.moveHead();
 
-        mapData.checkCollisions();
-        mapData.killCollidedSnakes();
-        if (mapData.liveSnakes.size() == 0) inGame = false;
-        mapData.checkFood();
+        board.checkCollisions();
+        board.killCollidedSnakes();
+        if (board.liveSnakes.size() == 0) inGame = false;
+        board.checkFood();
 
-        for (SnakeBase snake : mapData.liveSnakes)
+        for (SnakeBase snake : board.liveSnakes)
             snake.removeTailEnd();
     }
 
@@ -121,11 +121,11 @@ public class GameLoop extends JPanel implements Runnable {
 
     private void drawFood(Graphics g) {
         g.setColor(Color.red);
-        g.fillRect(mapData.foodPos.x * CELL_SIZE + 1, mapData.foodPos.y * CELL_SIZE + 1, 8, 8);
+        g.fillRect(board.foodPos.x * CELL_SIZE + 1, board.foodPos.y * CELL_SIZE + 1, 8, 8);
     }
 
     private void drawSnakes(Graphics g) {
-        for (SnakeBase snake : mapData.liveSnakes) {
+        for (SnakeBase snake : board.liveSnakes) {
             g.setColor(snake.color);
 
             GridPos coord = snake.coords.getFirst();
@@ -139,9 +139,9 @@ public class GameLoop extends JPanel implements Runnable {
 
     private void drawWalls(Graphics g) {
         g.setColor(Color.black);
-        for (int x = 0; x < mapData.width; x++) {
-            for (int y = 0; y < mapData.height; y++) {
-                if (mapData.walls[x][y]) {
+        for (int x = 0; x < board.width; x++) {
+            for (int y = 0; y < board.height; y++) {
+                if (board.walls[x][y]) {
                     g.fillRect(x * CELL_SIZE, y * CELL_SIZE, 10, 10);
                 }
             }
@@ -155,15 +155,15 @@ public class GameLoop extends JPanel implements Runnable {
         g.setColor(Color.white);
         g.setFont(small);
 
-        String[] msgs = new String[mapData.snakes.size() + 1];
+        String[] msgs = new String[board.snakes.size() + 1];
         msgs[0] = "Game Over";
-        for (int i = 0; i < mapData.snakes.size(); i++) {
-            msgs[i + 1] = "Snake " + mapData.snakes.get(i).id + ": " + mapData.snakes.get(i).score;
+        for (int i = 0; i < board.snakes.size(); i++) {
+            msgs[i + 1] = "Snake " + board.snakes.get(i).id + ": " + board.snakes.get(i).score;
         }
 
-        int yOffset = g.getFontMetrics().getHeight() * (mapData.snakes.size() / 2);
+        int yOffset = g.getFontMetrics().getHeight() * (board.snakes.size() / 2);
         for (int i = 0; i < msgs.length; i++) {
-            if (i > 0) g.setColor(mapData.snakes.get(i-1).color);
+            if (i > 0) g.setColor(board.snakes.get(i-1).color);
             g.drawString(
                 msgs[i],
                 (getWidth() - metr.stringWidth(msgs[i])) / 2,
@@ -181,7 +181,7 @@ public class GameLoop extends JPanel implements Runnable {
             if (key == KeyEvent.VK_ESCAPE)
                 System.exit(0);
 
-            for (SnakeBase snake : mapData.liveSnakes) {
+            for (SnakeBase snake : board.liveSnakes) {
                 if (!(snake instanceof PlayerSnake)) continue;
                 PlayerSnake playerSnake = (PlayerSnake) snake;
 

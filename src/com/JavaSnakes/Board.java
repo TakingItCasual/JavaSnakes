@@ -9,8 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-// TODO: Move snake data into here
-public class MapData {
+public class Board {
 
     public final int width;
     public final int height;
@@ -22,7 +21,7 @@ public class MapData {
     public List<SnakeBase> snakes;
     public List<SnakeBase> liveSnakes;
 
-    public MapData(int setMapW, int setMapH) {
+    public Board(int setMapW, int setMapH) {
         this.width = setMapW;
         this.height = setMapH;
 

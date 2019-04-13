@@ -1,6 +1,6 @@
 package com.JavaSnakes.Snakes;
 
-import com.JavaSnakes.MapData;
+import com.JavaSnakes.Board;
 import com.JavaSnakes.util.Direction;
 import com.JavaSnakes.util.GridPos;
 import com.JavaSnakes.util.Status;
@@ -16,7 +16,7 @@ public abstract class SnakeBase {
     public final int id;
 
     private static int initLength = 3;
-    public static MapData mapData;
+    public static Board board;
 
     public Status status;
     protected Direction direction;
@@ -55,10 +55,10 @@ public abstract class SnakeBase {
         if (direction == Direction.Left) newHead.x -= 1;
         if (direction == Direction.Right) newHead.x += 1;
 
-        if (newHead.x < 0) newHead.x = mapData.width - 1;
-        if (newHead.x >= mapData.width) newHead.x = 0;
-        if (newHead.y < 0) newHead.y = mapData.height - 1;
-        if (newHead.y >= mapData.height) newHead.y = 0;
+        if (newHead.x < 0) newHead.x = board.width - 1;
+        if (newHead.x >= board.width) newHead.x = 0;
+        if (newHead.y < 0) newHead.y = board.height - 1;
+        if (newHead.y >= board.height) newHead.y = 0;
 
         coords.addFirst(newHead);
     }

@@ -12,8 +12,8 @@ public class BotSnake extends SnakeBase {
     }
 
     public void processDirection() {
-        int diffX = mapData.foodPos.x - coords.getFirst().x;
-        int diffY = mapData.foodPos.y - coords.getFirst().y;
+        int diffX = board.foodPos.x - coords.getFirst().x;
+        int diffY = board.foodPos.y - coords.getFirst().y;
 
         if (Math.abs(diffX) < Math.abs(diffY)) {
             if (diffX > 0) {

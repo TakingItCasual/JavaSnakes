@@ -2,9 +2,9 @@ package com.JavaSnakes;
 
 import javax.swing.JFrame;
 
-public class GameScreen extends JFrame {
+public class Main extends JFrame {
 
-    public GameScreen() {
+    public Main() {
         add(new GameLoop());
 
         setResizable(false);
@@ -17,6 +17,6 @@ public class GameScreen extends JFrame {
     }
 
     public static void main(String[] args) {
-        new GameScreen();
+        new Main();
     }
 }
