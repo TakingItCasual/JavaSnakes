@@ -14,23 +14,32 @@ public class Board {
     public final int width;
     public final int height;
 
+    public final boolean isWalled;
     public boolean[][] walls;
-
-    public GridPos foodPos;
 
     public List<SnakeBase> snakes;
     public List<SnakeBase> liveSnakes;
 
-    public Board(int setMapW, int setMapH) {
+    public GridPos foodPos;
+
+    public Board(int setMapW, int setMapH, boolean includeWalls) {
         this.width = setMapW;
         this.height = setMapH;
 
+        this.isWalled = includeWalls;
         this.walls = new boolean[width][height];
-
-        this.foodPos = new GridPos();
+        if (isWalled) {
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    walls[x][y] = (x == 0 || x == width - 1 || y == 0 || y == height - 1);
+                }
+            }
+        }
 
         this.snakes = new ArrayList<>();
         this.liveSnakes = new ArrayList<>();
+
+        this.foodPos = new GridPos();
     }
 
     public void checkCollisions() {
@@ -90,7 +99,13 @@ public class Board {
     }
 
     public boolean tileObstructed(GridPos coord) {
+        normalizePos(coord);
         return tileHasWall(coord) || tileHasSnake(coord);
+    }
+
+    private void normalizePos(GridPos coord) {
+        coord.x = Math.floorMod(coord.x, width);
+        coord.y = Math.floorMod(coord.y, height);
     }
 
     private boolean tileHasWall(GridPos coord) {

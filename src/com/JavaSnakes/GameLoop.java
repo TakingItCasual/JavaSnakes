@@ -32,35 +32,21 @@ public class GameLoop extends JPanel implements Runnable {
         setBackground(Color.darkGray);
         setFocusable(true);
 
-        this.board = new Board(30, 30);
+        this.board = new Board(30, 30, false);
         SnakeBase.board = board;
 
         setPreferredSize(new Dimension(board.width * CELL_SIZE, board.height * CELL_SIZE));
-        initGame(true);
-    }
-
-    private void initGame(boolean includeWalls) {
-        if (includeWalls) {
-            for (int x = 0; x < board.width; x++) {
-                for (int y = 0; y < board.height; y++) {
-                    board.walls[x][y] = (x == 0 || x == board.width - 1 || y == 0 || y == board.height - 1);
-                }
-            }
-        }
-
-        board.createFood();
 
         board.snakes.add(new PlayerSnake(
-            Direction.Right, new GridPos(3, 3), Color.blue,
-            KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT
+                Direction.Right, new GridPos(3, 3), Color.blue,
+                KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT
         ));
-        /*board.snakes.add(new PlayerSnake(
-            Direction.Left, new GridPos(board.width - 4, board.height - 4), Color.cyan,
-            KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D
-        ));*/
-        board.snakes.add(new BotSnake(Direction.Down, new GridPos(board.width - 4, 3), Color.yellow));
-        //board.snakes.add(new BotSnake(Direction.Up, new GridPos(3, board.height - 4), Color.green));
+        board.snakes.add(new BotSnake(
+                Direction.Left, new GridPos(board.width - 4, board.height - 4), Color.yellow
+        ));
         board.liveSnakes.addAll(board.snakes);
+
+        board.createFood();
 
         this.inGame = true;
         this.animator = new Thread(this);
