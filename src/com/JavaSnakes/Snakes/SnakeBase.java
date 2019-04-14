@@ -78,5 +78,12 @@ public abstract class SnakeBase {
         return Collections.frequency(coords, coords.getFirst()) > 1;
     }
 
+    protected boolean directionsAreOpposite(Direction dir1, Direction dir2) {
+        return ((dir1 == Direction.Up && dir2 == Direction.Down) ||
+                (dir1 == Direction.Down && dir2 == Direction.Up) ||
+                (dir1 == Direction.Left && dir2 == Direction.Right) ||
+                (dir1 == Direction.Right && dir2 == Direction.Left));
+    }
+
     public abstract void processDirection();
 }

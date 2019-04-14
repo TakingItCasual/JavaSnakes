@@ -12,73 +12,89 @@ public class BotSnake extends SnakeBase {
     }
 
     public void processDirection() {
+        Direction[] dirPriority = new Direction[4];
+
         int diffX = board.foodPos.x - coords.getFirst().x;
         int diffY = board.foodPos.y - coords.getFirst().y;
 
         if (Math.abs(diffX) < Math.abs(diffY)) {
+            if (diffX != 0) {
+                if (diffY > 0) {
+                    dirPriority[1] = Direction.Down;
+                    dirPriority[2] = Direction.Up;
+                } else {
+                    dirPriority[1] = Direction.Up;
+                    dirPriority[2] = Direction.Down;
+                }
+            }
             if (diffX > 0) {
-                if (direction != Direction.Left) {
-                    direction = Direction.Right;
-                } else if (diffY > 0) {
-                    direction = Direction.Down;
-                } else if (diffY < 0) {
-                    direction = Direction.Up;
-                }
+                dirPriority[0] = Direction.Right;
+                dirPriority[3] = Direction.Left;
             } else if (diffX < 0) {
-                if (direction != Direction.Right) {
-                    direction = Direction.Left;
-                } else if (diffY > 0) {
-                    direction = Direction.Down;
-                } else if (diffY < 0) {
-                    direction = Direction.Up;
-                }
+                dirPriority[0] = Direction.Left;
+                dirPriority[3] = Direction.Right;
             } else {
                 if (diffY > 0) {
-                    if (direction != Direction.Up) {
-                        direction = Direction.Down;
-                    } else {
-                        direction = Direction.Left;
-                    }
-                } else if (diffY < 0) {
-                    if (direction != Direction.Down) {
-                        direction = Direction.Up;
-                    } else {
-                        direction = Direction.Right;
-                    }
+                    dirPriority[0] = Direction.Down;
+                    dirPriority[1] = Direction.Left;
+                    dirPriority[2] = Direction.Right;
+                    dirPriority[3] = Direction.Up;
+                } else {
+                    dirPriority[0] = Direction.Up;
+                    dirPriority[1] = Direction.Right;
+                    dirPriority[2] = Direction.Left;
+                    dirPriority[3] = Direction.Down;
                 }
             }
-        } else if (Math.abs(diffY) < Math.abs(diffX)) {
+        } else {
+            if (diffY != 0) {
+                if (diffX > 0) {
+                    dirPriority[1] = Direction.Right;
+                    dirPriority[2] = Direction.Left;
+                } else {
+                    dirPriority[1] = Direction.Left;
+                    dirPriority[2] = Direction.Right;
+                }
+            }
             if (diffY > 0) {
-                if (direction != Direction.Up) {
-                    direction = Direction.Down;
-                } else if (diffX > 0) {
-                    direction = Direction.Right;
-                } else if (diffX < 0) {
-                    direction = Direction.Left;
-                }
+                dirPriority[0] = Direction.Down;
+                dirPriority[3] = Direction.Up;
             } else if (diffY < 0) {
-                if (direction != Direction.Down) {
-                    direction = Direction.Up;
-                } else if (diffX > 0) {
-                    direction = Direction.Right;
-                } else if (diffX < 0) {
-                    direction = Direction.Left;
-                }
+                dirPriority[0] = Direction.Up;
+                dirPriority[3] = Direction.Down;
             } else {
                 if (diffX > 0) {
-                    if (direction != Direction.Left) {
-                        direction = Direction.Right;
-                    } else {
-                        direction = Direction.Down;
-                    }
-                } else if (diffX < 0) {
-                    if (direction != Direction.Right) {
-                        direction = Direction.Left;
-                    } else {
-                        direction = Direction.Up;
-                    }
+                    dirPriority[0] = Direction.Right;
+                    dirPriority[1] = Direction.Down;
+                    dirPriority[2] = Direction.Up;
+                    dirPriority[3] = Direction.Left;
+                } else {
+                    dirPriority[0] = Direction.Left;
+                    dirPriority[1] = Direction.Up;
+                    dirPriority[2] = Direction.Down;
+                    dirPriority[3] = Direction.Right;
                 }
             }
+        }
+
+        for (Direction dir : dirPriority) {
+            if (directionsAreOpposite(direction, dir)) continue;
+            if (nextTileObstructed(dir)) continue;
+            direction = dir;
+            break;
+        }
+    }
+
+    private boolean nextTileObstructed(Direction dir) {
+        GridPos headPos = coords.getFirst();
+        if (dir == Direction.Up) {
+            return board.tileObstructed(headPos.x, headPos.y - 1);
+        } else if (dir == Direction.Down) {
+            return board.tileObstructed(headPos.x, headPos.y + 1);
+        } else if (dir == Direction.Left) {
+            return board.tileObstructed(headPos.x - 1, headPos.y);
+        } else { // Direction.Right
+            return board.tileObstructed(headPos.x + 1, headPos.y);
         }
     }
 }

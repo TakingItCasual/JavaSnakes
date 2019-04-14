@@ -85,6 +85,10 @@ public class Board {
         }
     }
 
+    public boolean tileObstructed(int x, int y) {
+        return tileObstructed(new GridPos(x, y));
+    }
+
     public boolean tileObstructed(GridPos coord) {
         return tileHasWall(coord) || tileHasSnake(coord);
     }

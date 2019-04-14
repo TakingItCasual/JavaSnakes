@@ -20,7 +20,7 @@ import java.util.Iterator;
 public class GameLoop extends JPanel implements Runnable {
 
     private static final int CELL_SIZE = 10;
-    private static final int DELAY = 150;
+    private static final int DELAY = 100;
 
     private Board board;
 
@@ -54,12 +54,12 @@ public class GameLoop extends JPanel implements Runnable {
             Direction.Right, new GridPos(3, 3), Color.blue,
             KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT
         ));
-        board.snakes.add(new PlayerSnake(
+        /*board.snakes.add(new PlayerSnake(
             Direction.Left, new GridPos(board.width - 4, board.height - 4), Color.cyan,
             KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D
-        ));
+        ));*/
         board.snakes.add(new BotSnake(Direction.Down, new GridPos(board.width - 4, 3), Color.yellow));
-        board.snakes.add(new BotSnake(Direction.Up, new GridPos(3, board.height - 4), Color.green));
+        //board.snakes.add(new BotSnake(Direction.Up, new GridPos(3, board.height - 4), Color.green));
         board.liveSnakes.addAll(board.snakes);
 
         this.inGame = true;

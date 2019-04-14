@@ -31,6 +31,6 @@ public class GridPos {
 
     @Override
     public int hashCode() {
-        return x + y<<16; // Hashes are unique as long as x and y are less than 2^16
+        return x + y<<16; // Hashes are unique as long as x and y can be represented as shorts
     }
 }
