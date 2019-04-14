@@ -20,10 +20,10 @@ public class GridPos {
     }
 
     @Override
-    public boolean equals(Object o){
-        if (this == o) return true;
-        if(o instanceof GridPos){
-            GridPos other = (GridPos) o;
+    public boolean equals(Object obj){
+        if (this == obj) return true;
+        if(obj instanceof GridPos){
+            GridPos other = (GridPos) obj;
             return this.x == other.x && this.y == other.y;
         }
         return false;

@@ -11,6 +11,7 @@ public class BotSnake extends SnakeBase {
         super(setDirection, initPos, setColor);
     }
 
+    @Override
     public void processDirection() {
         Direction[] dirPriority = new Direction[4];
 

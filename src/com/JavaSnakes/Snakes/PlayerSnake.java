@@ -33,6 +33,7 @@ public class PlayerSnake extends SnakeBase {
         if (ctrlKeys.size() != 4) System.exit(1); // TODO: Properly handle duplicate control keys
     }
 
+    @Override
     public void processDirection() {
         if (!directionsAreOpposite(direction, directionBuffer)) {
             direction = directionBuffer;
