@@ -43,10 +43,9 @@ public class Board {
     }
 
     public void checkCollisions() {
-        for (int i = 0; i < liveSnakes.size(); i++) {
-            SnakeBase thisSnake = liveSnakes.get(i);
-            if (wallCollided(thisSnake) || thisSnake.selfCollided() || snakeCollided(thisSnake, i)) {
-                thisSnake.status = Status.Collided;
+        for (SnakeBase snake : liveSnakes) {
+            if (wallCollided(snake) || snake.selfCollided() || snakeCollided(snake)) {
+                snake.status = Status.Collided;
             }
         }
     }
@@ -55,12 +54,10 @@ public class Board {
         return walls[snake.coords.getFirst().x][snake.coords.getFirst().y];
     }
 
-    private boolean snakeCollided(SnakeBase thisSnake, int snakeNum) {
-        for (int otherSnakeNum = 0; otherSnakeNum < liveSnakes.size(); otherSnakeNum++) {
-            SnakeBase otherSnake = liveSnakes.get(otherSnakeNum);
-            if (snakeNum == otherSnakeNum) continue;
-
-            if (otherSnake.coords.contains(thisSnake.coords.getFirst())) {
+    private boolean snakeCollided(SnakeBase snake) {
+        for (SnakeBase otherSnake : liveSnakes) {
+            if (snake == otherSnake) continue;
+            if (otherSnake.coords.contains(snake.coords.getFirst())) {
                 return true;
             }
         }
