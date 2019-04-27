@@ -8,8 +8,8 @@ import com.JavaSnakes.util.GridPos;
 
 public class PlayerSnake extends SnakeBase {
 
-    public Direction directionBuffer;
-    public HashMap<Integer, Direction> ctrlKeys;
+    private Direction directionBuffer;
+    private HashMap<Integer, Direction> ctrlKeys;
 
     public PlayerSnake(
             Direction setDirection,
@@ -39,5 +39,11 @@ public class PlayerSnake extends SnakeBase {
             direction = directionBuffer;
         }
         directionBuffer = direction;
+    }
+
+    public void bufferInput(int inputKey) {
+        if (ctrlKeys.containsKey(inputKey)) {
+            directionBuffer = ctrlKeys.get(inputKey);
+        }
     }
 }

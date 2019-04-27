@@ -5,7 +5,7 @@ import javax.swing.JFrame;
 public class Main extends JFrame {
 
     public Main() {
-        add(new GameLoop());
+        add(new GameLoop(100, 10));
 
         setResizable(false);
         pack();
