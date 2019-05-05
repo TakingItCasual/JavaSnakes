@@ -26,11 +26,11 @@ public abstract class SnakeBase {
 
     public Color color;
 
-    SnakeBase(Direction setDirection, GridPos initPos, Color setColor) {
+    SnakeBase(Direction initDirection, GridPos initPos, Color setColor) {
         this.id = NEXT_ID.getAndIncrement();
 
         this.status = Status.Alive;
-        this.direction = setDirection;
+        this.direction = initDirection;
 
         this.coords = new LinkedList<>();
         for (int i = 0; i < initLength; i++) {

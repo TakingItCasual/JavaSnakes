@@ -7,8 +7,8 @@ import com.JavaSnakes.util.GridPos;
 
 public class BotSnake extends SnakeBase {
 
-    public BotSnake(Direction setDirection, GridPos initPos, Color setColor) {
-        super(setDirection, initPos, setColor);
+    public BotSnake(Direction initDirection, GridPos initPos, Color setColor) {
+        super(initDirection, initPos, setColor);
     }
 
     @Override
@@ -93,15 +93,14 @@ public class BotSnake extends SnakeBase {
     }
 
     private boolean nextTileObstructed(Direction dir) {
-        GridPos headPos = headPos();
         if (dir == Direction.Up) {
-            return board.tileObstructed(headPos.x, headPos.y - 1);
+            return board.tileObstructed(headPos().x, headPos().y - 1);
         } else if (dir == Direction.Down) {
-            return board.tileObstructed(headPos.x, headPos.y + 1);
+            return board.tileObstructed(headPos().x, headPos().y + 1);
         } else if (dir == Direction.Left) {
-            return board.tileObstructed(headPos.x - 1, headPos.y);
+            return board.tileObstructed(headPos().x - 1, headPos().y);
         } else { // Direction.Right
-            return board.tileObstructed(headPos.x + 1, headPos.y);
+            return board.tileObstructed(headPos().x + 1, headPos().y);
         }
     }
 }

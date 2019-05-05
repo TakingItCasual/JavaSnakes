@@ -31,7 +31,7 @@ public class GamePanel extends JPanel implements Runnable {
     private boolean inGame;
     private Thread animator;
 
-    public GamePanel(int setDelay, int setCellSize) {
+    public GamePanel(int setDelay, int setCellSize, int setMapW, int setMapH, boolean includeWalls) {
         this.delay = setDelay;
 
         this.cellSize = setCellSize;
@@ -42,7 +42,7 @@ public class GamePanel extends JPanel implements Runnable {
         setBackground(Color.darkGray);
         setFocusable(true);
 
-        this.board = new Board(30, 20, false);
+        this.board = new Board(setMapW, setMapH, includeWalls);
         SnakeBase.board = board;
 
         setPreferredSize(new Dimension(board.width * cellSize, board.height * cellSize));

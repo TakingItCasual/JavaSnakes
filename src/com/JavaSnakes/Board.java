@@ -83,6 +83,7 @@ public class Board {
         }
     }
 
+    // TODO: Implement a win mechanism instead of ending in an infinite loop
     public void createFood() {
         while (true) {
             foodPos.x = ThreadLocalRandom.current().nextInt(0, width);

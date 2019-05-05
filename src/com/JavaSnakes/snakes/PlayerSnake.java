@@ -12,7 +12,7 @@ public class PlayerSnake extends SnakeBase {
     private HashMap<Integer, Direction> ctrlKeys;
 
     public PlayerSnake(
-            Direction setDirection,
+            Direction initDirection,
             GridPos initPos,
             Color setColor,
             int ctrlUp,
@@ -20,9 +20,9 @@ public class PlayerSnake extends SnakeBase {
             int ctrlLeft,
             int ctrlRight
     ) {
-        super(setDirection, initPos, setColor);
+        super(initDirection, initPos, setColor);
 
-        this.directionBuffer = setDirection;
+        this.directionBuffer = initDirection;
 
         this.ctrlKeys = new HashMap<>();
         ctrlKeys.put(ctrlUp, Direction.Up);
