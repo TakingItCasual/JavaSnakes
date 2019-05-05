@@ -1,4 +1,4 @@
-package com.JavaSnakes.Snakes;
+package com.JavaSnakes.snakes;
 
 import com.JavaSnakes.Board;
 import com.JavaSnakes.util.Direction;
@@ -48,7 +48,7 @@ public abstract class SnakeBase {
     }
 
     public void moveHead() {
-        GridPos newHead = new GridPos(coords.getFirst());
+        GridPos newHead = new GridPos(headPos());
 
         if (direction == Direction.Up) newHead.y -= 1;
         if (direction == Direction.Down) newHead.y += 1;
@@ -76,6 +76,10 @@ public abstract class SnakeBase {
 
     public boolean selfCollided() {
         return Collections.frequency(coords, coords.getFirst()) > 1;
+    }
+
+    public GridPos headPos() {
+        return coords.getFirst();
     }
 
     protected boolean directionsAreOpposite(Direction dir1, Direction dir2) {

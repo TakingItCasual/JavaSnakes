@@ -1,8 +1,9 @@
-package com.JavaSnakes;
+package com.JavaSnakes.panels;
 
-import com.JavaSnakes.Snakes.BotSnake;
-import com.JavaSnakes.Snakes.PlayerSnake;
-import com.JavaSnakes.Snakes.SnakeBase;
+import com.JavaSnakes.Board;
+import com.JavaSnakes.snakes.BotSnake;
+import com.JavaSnakes.snakes.PlayerSnake;
+import com.JavaSnakes.snakes.SnakeBase;
 import com.JavaSnakes.util.Direction;
 import com.JavaSnakes.util.GridPos;
 
@@ -17,7 +18,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Iterator;
 
-public class GameLoop extends JPanel implements Runnable {
+public class GamePanel extends JPanel implements Runnable {
 
     private final int delay;
 
@@ -25,12 +26,12 @@ public class GameLoop extends JPanel implements Runnable {
     private final int miniCell;
     private final int miniOffset;
 
-    private Board board;
+    private final Board board;
 
     private boolean inGame;
     private Thread animator;
 
-    public GameLoop(int setDelay, int setCellSize) {
+    public GamePanel(int setDelay, int setCellSize) {
         this.delay = setDelay;
 
         this.cellSize = setCellSize;
@@ -83,8 +84,8 @@ public class GameLoop extends JPanel implements Runnable {
         board.checkCollisions();
         board.killCollidedSnakes();
         if (board.liveSnakes.size() == 0) inGame = false;
-        board.checkFood();
 
+        board.checkFood();
         for (SnakeBase snake : board.liveSnakes)
             snake.removeTailEnd();
     }
@@ -94,7 +95,8 @@ public class GameLoop extends JPanel implements Runnable {
         if (sleep > 0) {
             try {
                 Thread.sleep(sleep);
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+            }
         }
     }
 
@@ -123,8 +125,7 @@ public class GameLoop extends JPanel implements Runnable {
         for (SnakeBase snake : board.liveSnakes) {
             g.setColor(snake.color);
 
-            GridPos coord = snake.coords.getFirst();
-            drawFullSquare(g, coord);
+            drawFullSquare(g, snake.headPos());
             for (Iterator<GridPos> iter = snake.coords.listIterator(1); iter.hasNext(); ) {
                 drawMiniSquare(g, iter.next());
             }

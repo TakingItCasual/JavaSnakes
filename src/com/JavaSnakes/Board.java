@@ -1,6 +1,6 @@
 package com.JavaSnakes;
 
-import com.JavaSnakes.Snakes.SnakeBase;
+import com.JavaSnakes.snakes.SnakeBase;
 import com.JavaSnakes.util.GridPos;
 import com.JavaSnakes.util.Status;
 
@@ -51,13 +51,13 @@ public class Board {
     }
 
     private boolean wallCollided(SnakeBase snake) {
-        return walls[snake.coords.getFirst().x][snake.coords.getFirst().y];
+        return walls[snake.headPos().x][snake.headPos().y];
     }
 
     private boolean snakeCollided(SnakeBase snake) {
         for (SnakeBase otherSnake : liveSnakes) {
             if (snake == otherSnake) continue;
-            if (otherSnake.coords.contains(snake.coords.getFirst())) {
+            if (otherSnake.coords.contains(snake.headPos())) {
                 return true;
             }
         }
@@ -76,7 +76,7 @@ public class Board {
 
     public void checkFood() {
         for (SnakeBase snake : liveSnakes) {
-            if (snake.coords.getFirst().equals(foodPos)) {
+            if (snake.headPos().equals(foodPos)) {
                 snake.feed();
                 createFood();
             }

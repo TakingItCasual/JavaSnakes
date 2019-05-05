@@ -1,4 +1,4 @@
-package com.JavaSnakes.Snakes;
+package com.JavaSnakes.snakes;
 
 import java.awt.Color;
 
@@ -15,8 +15,8 @@ public class BotSnake extends SnakeBase {
     public void processDirection() {
         Direction[] dirPriority = new Direction[4];
 
-        int diffX = board.foodPos.x - coords.getFirst().x;
-        int diffY = board.foodPos.y - coords.getFirst().y;
+        int diffX = board.foodPos.x - headPos().x;
+        int diffY = board.foodPos.y - headPos().y;
         if (!board.isWalled) {
             int altDiffX = diffX >= 0 ? diffX - board.width : diffX + board.width;
             int altDiffY = diffY >= 0 ? diffY - board.height : diffY + board.height;
@@ -93,7 +93,7 @@ public class BotSnake extends SnakeBase {
     }
 
     private boolean nextTileObstructed(Direction dir) {
-        GridPos headPos = coords.getFirst();
+        GridPos headPos = headPos();
         if (dir == Direction.Up) {
             return board.tileObstructed(headPos.x, headPos.y - 1);
         } else if (dir == Direction.Down) {

@@ -1,4 +1,4 @@
-package com.JavaSnakes.Snakes;
+package com.JavaSnakes.snakes;
 
 import java.awt.Color;
 import java.util.HashMap;
