@@ -10,8 +10,8 @@ public class GridPos {
     }
 
     public GridPos(int setX, int setY) {
-        this.x = setX;
-        this.y = setY;
+        x = setX;
+        y = setY;
     }
 
     public GridPos(GridPos other) {

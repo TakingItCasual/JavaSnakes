@@ -1,6 +1,7 @@
 package com.JavaSnakes.panels;
 
 import com.JavaSnakes.Board;
+import com.JavaSnakes.Main;
 import com.JavaSnakes.snakes.BotSnake;
 import com.JavaSnakes.snakes.PlayerSnake;
 import com.JavaSnakes.snakes.SnakeBase;
@@ -20,53 +21,96 @@ import java.util.Iterator;
 
 public class GamePanel extends JPanel implements Runnable {
 
+    private final Main owner;
+
     private final int delay;
 
     private final int cellSize;
     private final int miniCell;
     private final int miniOffset;
 
-    private final Board board;
+    private Board board;
 
     private boolean inGame;
     private Thread animator;
 
-    public GamePanel(int setDelay, int setCellSize, int setMapW, int setMapH, boolean includeWalls) {
-        this.delay = setDelay;
+    public GamePanel(Main setOwner, int setDelay, int setCellSize) {
+        owner = setOwner;
 
-        this.cellSize = setCellSize;
-        this.miniOffset = 1;
-        this.miniCell = cellSize - 2 * miniOffset;
+        delay = setDelay;
+
+        cellSize = setCellSize;
+        miniOffset = 1;
+        miniCell = cellSize - 2 * miniOffset;
 
         addKeyListener(new Input());
         setBackground(Color.darkGray);
         setFocusable(true);
+    }
 
-        this.board = new Board(setMapW, setMapH, includeWalls);
+    public void initBoard(int setMapW, int setMapH, boolean includeWalls) {
+        board = new Board(setMapW, setMapH, includeWalls);
         SnakeBase.board = board;
 
         setPreferredSize(new Dimension(board.width * cellSize, board.height * cellSize));
+    }
 
-        board.snakes.add(new PlayerSnake(
-            Direction.Right, new GridPos(3, 3), Color.blue,
-            KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT
-        ));
-        board.snakes.add(new BotSnake(
-            Direction.Left, new GridPos(board.width - 4, board.height - 4), Color.yellow
-        ));
-        board.liveSnakes.addAll(board.snakes);
-
+    public void initLoop() {
         board.createFood();
 
-        this.inGame = true;
-        this.animator = new Thread(this);
+        inGame = true;
+        animator = new Thread(this);
         animator.start();
+    }
+
+    public void createPlayerSnake(Color snakeColor, int ctrlUp, int ctrlDown, int ctrlLeft, int ctrlRight) {
+        board.snakes.add(new PlayerSnake(
+            getSnakeInitDir(), getSnakeInitPos(), snakeColor,
+            ctrlUp, ctrlDown, ctrlLeft, ctrlRight
+        ));
+        board.liveSnakes.add(board.snakes.get(board.snakes.size() - 1));
+    }
+
+    public void createBotSnake(Color snakeColor) {
+        board.snakes.add(new BotSnake(getSnakeInitDir(), getSnakeInitPos(), snakeColor));
+        board.liveSnakes.add(board.snakes.get(board.snakes.size() - 1));
+    }
+
+    private Direction getSnakeInitDir() {
+        if (board.snakes.size() % 4 == 0) {
+            return Direction.Right;
+        } else if (board.snakes.size() % 4 == 1) {
+            return Direction.Left;
+        } else if (board.snakes.size() % 4 == 2) {
+            return Direction.Down;
+        } else {
+            return Direction.Up;
+        }
+    }
+
+    private GridPos getSnakeInitPos() {
+        int snakeCount = board.snakes.size();
+        int extra = snakeCount / 4;
+
+        int initPosX = 3 + 3 * extra;
+        int initPosY = 3 + 3 * extra;
+        if (snakeCount % 4 == 1 || snakeCount % 4 == 2) {
+            initPosX = board.width - 4 - 3 * extra;
+        }
+        if (snakeCount % 4 == 1 || snakeCount % 4 == 3) {
+            initPosY = board.height - 4 - 3 * extra;
+        }
+
+        return new GridPos(initPosX, initPosY);
     }
 
     @Override
     public void run() {
+        long beforeTime = System.currentTimeMillis();
+        frameDelay(beforeTime);
+
         while (inGame) {
-            long beforeTime = System.currentTimeMillis();
+            beforeTime = System.currentTimeMillis();
 
             gameLogic();
             paintImmediately(getBounds());

@@ -23,11 +23,11 @@ public class Board {
     public GridPos foodPos;
 
     public Board(int setMapW, int setMapH, boolean includeWalls) {
-        this.width = setMapW;
-        this.height = setMapH;
+        width = setMapW;
+        height = setMapH;
 
-        this.isWalled = includeWalls;
-        this.walls = new boolean[width][height];
+        isWalled = includeWalls;
+        walls = new boolean[width][height];
         if (isWalled) {
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
@@ -36,10 +36,10 @@ public class Board {
             }
         }
 
-        this.snakes = new ArrayList<>();
-        this.liveSnakes = new ArrayList<>();
+        snakes = new ArrayList<>();
+        liveSnakes = new ArrayList<>();
 
-        this.foodPos = new GridPos();
+        foodPos = new GridPos();
     }
 
     public void checkCollisions() {

@@ -22,9 +22,9 @@ public class PlayerSnake extends SnakeBase {
     ) {
         super(initDirection, initPos, setColor);
 
-        this.directionBuffer = initDirection;
+        directionBuffer = initDirection;
 
-        this.ctrlKeys = new HashMap<>();
+        ctrlKeys = new HashMap<>();
         ctrlKeys.put(ctrlUp, Direction.Up);
         ctrlKeys.put(ctrlDown, Direction.Down);
         ctrlKeys.put(ctrlLeft, Direction.Left);

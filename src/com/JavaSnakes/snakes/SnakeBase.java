@@ -27,12 +27,12 @@ public abstract class SnakeBase {
     public Color color;
 
     SnakeBase(Direction initDirection, GridPos initPos, Color setColor) {
-        this.id = NEXT_ID.getAndIncrement();
+        id = NEXT_ID.getAndIncrement();
 
-        this.status = Status.Alive;
-        this.direction = initDirection;
+        status = Status.Alive;
+        direction = initDirection;
 
-        this.coords = new LinkedList<>();
+        coords = new LinkedList<>();
         for (int i = 0; i < initLength; i++) {
             coords.addLast(new GridPos(initPos.x, initPos.y));
             if (direction == Direction.Up) initPos.y += 1;
@@ -41,10 +41,10 @@ public abstract class SnakeBase {
             if (direction == Direction.Right) initPos.x -= 1;
         }
 
-        this.color = setColor;
+        color = setColor;
 
-        this.length = initLength;
-        this.score = 0;
+        length = initLength;
+        score = 0;
     }
 
     public void moveHead() {
