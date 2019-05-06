@@ -5,6 +5,7 @@ import com.JavaSnakes.Main;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.KeyEvent;
@@ -33,8 +34,6 @@ public class MenuPanel extends JPanel {
     private JCheckBox wallCheckBox;
     private JButton toMainButton;
 
-    private JPanel buttonGrid1, buttonGrid2;
-
     private int mapW;
     private int mapH;
     private int maxSnakeCount;
@@ -46,12 +45,41 @@ public class MenuPanel extends JPanel {
         mapH = 20;
         maxSnakeCount = 8;
 
+        setLayout(new CardLayout());
+
+        createMainMenuCard();
+        createNewGameCard();
+
+        //((SpinnerNumberModel) playerSnakeSpinner.getModel()).setMaximum(maxSnakeCount + 1);
+        //((SpinnerNumberModel) botSnakeSpinner.getModel()).setMaximum(maxSnakeCount + 1);
+
+        cardLayout = (CardLayout) getLayout();
+        setPreferredSize(new Dimension(300, 300));
+    }
+
+    private void createMainMenuCard() {
         newGameButton = new JButton("New Game");
         newGameButton.addActionListener(e -> toNewGameCard());
         settingsButton = new JButton("Settings");
         quitButton = new JButton("Quit");
         quitButton.addActionListener(e -> System.exit(0));
 
+        GridBagConstraints constraint = new GridBagConstraints();
+        constraint.fill = GridBagConstraints.HORIZONTAL;
+
+        JPanel gridBag = new JPanel(new GridBagLayout());
+        constraint.gridy = 0;
+        constraint.gridx = 0;
+        gridBag.add(newGameButton, constraint);
+        constraint.gridy = 1;
+        gridBag.add(settingsButton, constraint);
+        constraint.gridy = 2;
+        gridBag.add(quitButton, constraint);
+
+        add(gridBag, "main menu card");
+    }
+
+    private void createNewGameCard() {
         startGameButton = new JButton("Start Game");
         startGameButton.addActionListener(e -> startGame());
         wallCheckBox = new JCheckBox("Include walls");
@@ -64,43 +92,42 @@ public class MenuPanel extends JPanel {
         toMainButton = new JButton("Back");
         toMainButton.addActionListener(e -> toMainMenuCard());
 
-        //((SpinnerNumberModel) playerSnakeSpinner.getModel()).setMaximum(maxSnakeCount + 1);
-        //((SpinnerNumberModel) botSnakeSpinner.getModel()).setMaximum(maxSnakeCount + 1);
+        GridBagConstraints constraint = new GridBagConstraints();
+        constraint.fill = GridBagConstraints.HORIZONTAL;
 
-        buttonGrid1 = new JPanel(new GridLayout(3, 1));
-        buttonGrid1.add(newGameButton);
-        buttonGrid1.add(settingsButton);
-        buttonGrid1.add(quitButton);
-        JPanel gridBag1 = new JPanel(new GridBagLayout());
-        gridBag1.add(buttonGrid1);
+        JPanel gridBag = new JPanel(new GridBagLayout());
+        constraint.gridy = 0;
+        constraint.gridx = 0;
+        constraint.gridwidth = 2;
+        gridBag.add(startGameButton, constraint);
+        constraint.gridy = 1;
+        constraint.gridwidth = 1;
+        gridBag.add(playerSnakeCountLabel, constraint);
+        constraint.gridx = 1;
+        gridBag.add(playerSnakeSpinner, constraint);
+        constraint.gridy = 2;
+        constraint.gridx = 0;
+        gridBag.add(botSnakeCountLabel, constraint);
+        constraint.gridx = 1;
+        gridBag.add(botSnakeSpinner, constraint);
+        constraint.gridy = 3;
+        constraint.gridx = 0;
+        gridBag.add(wallCheckBox, constraint);
+        constraint.gridy = 4;
+        constraint.gridwidth = 2;
+        gridBag.add(toMainButton, constraint);
 
-        buttonGrid2 = new JPanel(new GridLayout(5, 2));
-        buttonGrid2.add(startGameButton);
-        buttonGrid2.add(playerSnakeCountLabel);
-        buttonGrid2.add(playerSnakeSpinner);
-        buttonGrid2.add(botSnakeCountLabel);
-        buttonGrid2.add(botSnakeSpinner);
-        buttonGrid2.add(wallCheckBox);
-        buttonGrid2.add(toMainButton);
-        JPanel gridBag2 = new JPanel(new GridBagLayout());
-        gridBag2.add(buttonGrid2);
-
-        setLayout(new CardLayout());
-        add(gridBag1, "main menu card");
-        add(gridBag2, "new game card");
-        cardLayout = (CardLayout) getLayout();
-
-        setPreferredSize(new Dimension(300, 300));
-    }
-
-    private void toNewGameCard() {
-        cardLayout.show(this, "new game card");
-        startGameButton.requestFocus();
+        add(gridBag, "new game card");
     }
 
     private void toMainMenuCard() {
         cardLayout.show(this, "main menu card");
         newGameButton.requestFocus();
+    }
+
+    private void toNewGameCard() {
+        cardLayout.show(this, "new game card");
+        startGameButton.requestFocus();
     }
 
     private void playerSnakeCountChanged() {

@@ -34,7 +34,7 @@ public abstract class SnakeBase {
 
         coords = new LinkedList<>();
         for (int i = 0; i < initLength; i++) {
-            coords.addLast(new GridPos(initPos.x, initPos.y));
+            coords.addLast(new GridPos(initPos));
             if (direction == Direction.Up) initPos.y += 1;
             if (direction == Direction.Down) initPos.y -= 1;
             if (direction == Direction.Left) initPos.x += 1;
