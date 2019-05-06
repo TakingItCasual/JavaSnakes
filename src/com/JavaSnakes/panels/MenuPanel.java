@@ -7,7 +7,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.KeyEvent;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -27,31 +26,28 @@ public class MenuPanel extends JPanel {
     private JButton quitButton;
 
     private JButton startGameButton;
-    private JLabel playerSnakeCountLabel;
     private JSpinner playerSnakeSpinner;
-    private JLabel botSnakeCountLabel;
     private JSpinner botSnakeSpinner;
     private JCheckBox wallCheckBox;
-    private JButton toMainButton;
+    private JButton toMainButton1;
 
-    private int mapW;
-    private int mapH;
+    private JButton toMainButton2;
+    private JSpinner mapWidthSpinner;
+    private JSpinner mapHeightSpinner;
+    private JSpinner frameDelaySpinner;
+
     private int maxSnakeCount;
 
     public MenuPanel(Main setOwner) {
         owner = setOwner;
 
-        mapW = 30;
-        mapH = 20;
         maxSnakeCount = 8;
 
         setLayout(new CardLayout());
 
         createMainMenuCard();
         createNewGameCard();
-
-        //((SpinnerNumberModel) playerSnakeSpinner.getModel()).setMaximum(maxSnakeCount + 1);
-        //((SpinnerNumberModel) botSnakeSpinner.getModel()).setMaximum(maxSnakeCount + 1);
+        createSettingsCard();
 
         cardLayout = (CardLayout) getLayout();
         setPreferredSize(new Dimension(300, 300));
@@ -61,6 +57,7 @@ public class MenuPanel extends JPanel {
         newGameButton = new JButton("New Game");
         newGameButton.addActionListener(e -> toNewGameCard());
         settingsButton = new JButton("Settings");
+        settingsButton.addActionListener(e -> toSettingsCard());
         quitButton = new JButton("Quit");
         quitButton.addActionListener(e -> System.exit(0));
 
@@ -83,14 +80,14 @@ public class MenuPanel extends JPanel {
         startGameButton = new JButton("Start Game");
         startGameButton.addActionListener(e -> startGame());
         wallCheckBox = new JCheckBox("Include walls");
-        playerSnakeCountLabel = new JLabel("Player count:");
+        JLabel playerSnakeCountLabel = new JLabel("Player count:");
         playerSnakeSpinner = new JSpinner(new SpinnerNumberModel(1, 0, maxSnakeCount, 1));
         playerSnakeSpinner.addChangeListener(e -> playerSnakeCountChanged());
-        botSnakeCountLabel = new JLabel("Bot count:");
+        JLabel botSnakeCountLabel = new JLabel("Bot count:");
         botSnakeSpinner = new JSpinner(new SpinnerNumberModel(0, 0, maxSnakeCount, 1));
         botSnakeSpinner.addChangeListener(e -> botSnakeCountChanged());
-        toMainButton = new JButton("Back");
-        toMainButton.addActionListener(e -> toMainMenuCard());
+        toMainButton1 = new JButton("Back");
+        toMainButton1.addActionListener(e -> toMainMenuCard());
 
         GridBagConstraints constraint = new GridBagConstraints();
         constraint.fill = GridBagConstraints.HORIZONTAL;
@@ -115,9 +112,47 @@ public class MenuPanel extends JPanel {
         gridBag.add(wallCheckBox, constraint);
         constraint.gridy = 4;
         constraint.gridwidth = 2;
-        gridBag.add(toMainButton, constraint);
+        gridBag.add(toMainButton1, constraint);
 
         add(gridBag, "new game card");
+    }
+
+    private void createSettingsCard() {
+        toMainButton2 = new JButton("Back");
+        toMainButton2.addActionListener(e -> toMainMenuCard());
+        JLabel mapWidthLabel = new JLabel("Map width:");
+        mapWidthSpinner = new JSpinner(new SpinnerNumberModel(30, 20, 100, 1));
+        JLabel mapHeightLabel = new JLabel("Map height:");
+        mapHeightSpinner = new JSpinner(new SpinnerNumberModel(20, 20, 100, 1));
+        JLabel frameDelayLabel = new JLabel("Frame delay:");
+        frameDelaySpinner = new JSpinner(new SpinnerNumberModel(100, 25, 1000, 25));
+        frameDelaySpinner.addChangeListener(e -> frameDelayChanged());
+
+        GridBagConstraints constraint = new GridBagConstraints();
+        constraint.fill = GridBagConstraints.HORIZONTAL;
+
+        JPanel gridBag = new JPanel(new GridBagLayout());
+        constraint.gridy = 0;
+        constraint.gridx = 0;
+        constraint.gridwidth = 2;
+        gridBag.add(toMainButton2, constraint);
+        constraint.gridy = 1;
+        constraint.gridwidth = 1;
+        gridBag.add(mapWidthLabel, constraint);
+        constraint.gridx = 1;
+        gridBag.add(mapWidthSpinner, constraint);
+        constraint.gridy = 2;
+        constraint.gridx = 0;
+        gridBag.add(mapHeightLabel, constraint);
+        constraint.gridx = 1;
+        gridBag.add(mapHeightSpinner, constraint);
+        constraint.gridy = 3;
+        constraint.gridx = 0;
+        gridBag.add(frameDelayLabel, constraint);
+        constraint.gridx = 1;
+        gridBag.add(frameDelaySpinner, constraint);
+
+        add(gridBag, "settings card");
     }
 
     private void toMainMenuCard() {
@@ -126,8 +161,18 @@ public class MenuPanel extends JPanel {
     }
 
     private void toNewGameCard() {
+        int minDimension = Math.min((int) mapWidthSpinner.getValue(), (int) mapHeightSpinner.getValue());
+        maxSnakeCount = ((minDimension - 11) / 6 + 1) * 4;
+        playerSnakeSpinner.setModel(new SpinnerNumberModel(1, 0, maxSnakeCount, 1));
+        botSnakeSpinner.setModel(new SpinnerNumberModel(0, 0, maxSnakeCount, 1));
+
         cardLayout.show(this, "new game card");
         startGameButton.requestFocus();
+    }
+
+    private void toSettingsCard() {
+        cardLayout.show(this, "settings card");
+        toMainButton2.requestFocus();
     }
 
     private void playerSnakeCountChanged() {
@@ -146,10 +191,21 @@ public class MenuPanel extends JPanel {
         }
     }
 
-    private void startGame() {
-        GamePanel gamePanel = new GamePanel(owner, 100, 10);
+    private void frameDelayChanged() {
+        int frameDelay = (int) frameDelaySpinner.getValue();
+        if (frameDelay % 25 != 0) {
+            frameDelaySpinner.setValue(Math.round((float) frameDelay / 25) * 25);
+        }
+    }
 
-        gamePanel.initBoard(mapW, mapH, wallCheckBox.isSelected());
+    private void startGame() {
+        GamePanel gamePanel = new GamePanel(owner, (int) frameDelaySpinner.getValue(), 10);
+
+        gamePanel.initBoard(
+            (int) mapWidthSpinner.getValue(),
+            (int) mapHeightSpinner.getValue(),
+            wallCheckBox.isSelected()
+        );
 
         for (int i = 0; i < (int) playerSnakeSpinner.getValue(); i++) {
             gamePanel.createPlayerSnake(Color.blue, KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT);
