@@ -8,7 +8,6 @@ import com.JavaSnakes.snakes.SnakeBase;
 import com.JavaSnakes.util.Direction;
 import com.JavaSnakes.util.GridPos;
 
-import javax.swing.JPanel;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -18,6 +17,7 @@ import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Iterator;
+import javax.swing.JPanel;
 
 public class GamePanel extends JPanel implements Runnable {
 
