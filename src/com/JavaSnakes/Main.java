@@ -14,7 +14,7 @@ public class Main extends JFrame {
         setTitle("Snake");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        changePanel(new MenuPanel(this));
+        changePanel(new MenuPanel(this).mainPanel);
     }
 
     public void changePanel(JPanel newPanel) {

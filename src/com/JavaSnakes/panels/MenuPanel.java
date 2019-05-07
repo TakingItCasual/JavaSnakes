@@ -1,13 +1,12 @@
 package com.JavaSnakes.panels;
 
 import com.JavaSnakes.Main;
+import com.JavaSnakes.util.MenuCard;
 
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -26,9 +25,10 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
-public class MenuPanel extends JPanel {
+public class MenuPanel {
 
     private final Main owner;
+    public JPanel mainPanel;
 
     private CardLayout cardLayout;
 
@@ -47,7 +47,7 @@ public class MenuPanel extends JPanel {
     private JSpinner mapHeightSpinner;
     private JSpinner frameDelaySpinner;
     private JSpinner snakeNumSpinner;
-    private JTextField[] dirCtrlFields;
+    private JTextField[] dirCtrlFields; // Ordered by up, down, left, and right
 
     private int maxSnakeCount;
     private List<int[]> playerControls;
@@ -56,20 +56,21 @@ public class MenuPanel extends JPanel {
     public MenuPanel(Main setOwner) {
         owner = setOwner;
 
+        mainPanel = new JPanel();
+        mainPanel.setLayout(new CardLayout());
+
         maxSnakeCount = 8;
         playerControls = new ArrayList<>();
         playerControls.add(new int[]{KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT});
         playerControls.add(new int[]{KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D});
         playerControlsTemp = new int[4];
 
-        setLayout(new CardLayout());
-
         createMainMenuCard();
         createNewGameCard();
         createSettingsCard();
 
-        cardLayout = (CardLayout) getLayout();
-        setPreferredSize(new Dimension(300, 300));
+        cardLayout = (CardLayout) mainPanel.getLayout();
+        mainPanel.setPreferredSize(new Dimension(300, 300));
     }
 
     private void createMainMenuCard() {
@@ -80,12 +81,12 @@ public class MenuPanel extends JPanel {
         quitButton = new JButton("Quit");
         quitButton.addActionListener(e -> System.exit(0));
 
-        JPanel gridBag = new JPanel(new GridBagLayout());
-        gridBag.add(newGameButton, constraint(0, 0));
-        gridBag.add(settingsButton, constraint(1, 0));
-        gridBag.add(quitButton, constraint(2, 0));
+        MenuCard gridBag = new MenuCard();
+        gridBag.addInGrid(newGameButton, 0, 0);
+        gridBag.addInGrid(settingsButton, 1, 0);
+        gridBag.addInGrid(quitButton, 2, 0);
 
-        add(gridBag, "main menu card");
+        mainPanel.add(gridBag, "main menu card");
     }
 
     private void createNewGameCard() {
@@ -101,16 +102,16 @@ public class MenuPanel extends JPanel {
         toMainButton1 = new JButton("Back");
         toMainButton1.addActionListener(e -> toMainMenuCard());
 
-        JPanel gridBag = new JPanel(new GridBagLayout());
-        gridBag.add(startGameButton, constraint(0, 0, 2));
-        gridBag.add(playerSnakeCountLabel, constraint(1, 0));
-        gridBag.add(playerSnakeSpinner, constraint(1, 1, 1, new Insets(0, 5, 0, 0)));
-        gridBag.add(botSnakeCountLabel, constraint(2, 0));
-        gridBag.add(botSnakeSpinner, constraint(2, 1, 1, new Insets(0, 5, 0, 0)));
-        gridBag.add(wallCheckBox, constraint(3, 0, 2));
-        gridBag.add(toMainButton1, constraint(4, 0, 2));
+        MenuCard gridBag = new MenuCard();
+        gridBag.addInGrid(startGameButton, 0, 0, 2);
+        gridBag.addInGrid(playerSnakeCountLabel, 1, 0);
+        gridBag.addInGrid(playerSnakeSpinner, 1, 1, 1, new Insets(0, 5, 0, 0));
+        gridBag.addInGrid(botSnakeCountLabel, 2, 0);
+        gridBag.addInGrid(botSnakeSpinner, 2, 1, 1, new Insets(0, 5, 0, 0));
+        gridBag.addInGrid(wallCheckBox, 3, 0, 2);
+        gridBag.addInGrid(toMainButton1, 4, 0, 2);
 
-        add(gridBag, "new game card");
+        mainPanel.add(gridBag, "new game card");
     }
 
     private void createSettingsCard() {
@@ -135,8 +136,8 @@ public class MenuPanel extends JPanel {
         dirCtrlFields = new JTextField[4];
         for (int i = 0; i < dirCtrlFields.length; i++) {
             dirCtrlFields[i] = new JTextField("");
-            dirCtrlFields[i].addKeyListener(new ctrlInput(i));
-            dirCtrlFields[i].addFocusListener(new ctrlInputFocus(i));
+            dirCtrlFields[i].addKeyListener(new CtrlInput(i));
+            dirCtrlFields[i].addFocusListener(new CtrlInputFocus(i));
         }
 
         String fontFamily = dirCtrlFields[0].getFont().getFamily();
@@ -148,49 +149,31 @@ public class MenuPanel extends JPanel {
 
         snakeNumChanged(); // Fill out player settings with first player's info
 
-        JPanel gridBag = new JPanel(new GridBagLayout());
-        gridBag.add(toMainButton2, constraint(0, 0, 2));
-        gridBag.add(mapWidthLabel, constraint(1, 0));
-        gridBag.add(mapWidthSpinner, constraint(1, 1));
-        gridBag.add(mapHeightLabel, constraint(2, 0));
-        gridBag.add(mapHeightSpinner, constraint(2, 1));
-        gridBag.add(frameDelayLabel, constraint(3, 0));
-        gridBag.add(frameDelaySpinner, constraint(3, 1));
-        gridBag.add(separator, constraint(4, 0, 2, new Insets(5, 0, 5, 0)));
-        gridBag.add(snakeNumLabel, constraint(5, 0));
-        gridBag.add(snakeNumSpinner, constraint(5, 1));
-        gridBag.add(upCtrlLabel, constraint(6, 0));
-        gridBag.add(dirCtrlFields[0], constraint(6, 1));
-        gridBag.add(downCtrlLabel, constraint(7, 0));
-        gridBag.add(dirCtrlFields[1], constraint(7, 1));
-        gridBag.add(leftCtrlLabel, constraint(8, 0));
-        gridBag.add(dirCtrlFields[2], constraint(8, 1));
-        gridBag.add(rightCtrlLabel, constraint(9, 0));
-        gridBag.add(dirCtrlFields[3], constraint(9, 1));
+        MenuCard gridBag = new MenuCard();
+        gridBag.addInGrid(toMainButton2, 0, 0, 2);
+        gridBag.addInGrid(mapWidthLabel, 1, 0);
+        gridBag.addInGrid(mapWidthSpinner, 1, 1);
+        gridBag.addInGrid(mapHeightLabel, 2, 0);
+        gridBag.addInGrid(mapHeightSpinner, 2, 1);
+        gridBag.addInGrid(frameDelayLabel, 3, 0);
+        gridBag.addInGrid(frameDelaySpinner, 3, 1);
+        gridBag.addInGrid(separator, 4, 0, 2, new Insets(5, 0, 5, 0));
+        gridBag.addInGrid(snakeNumLabel, 5, 0);
+        gridBag.addInGrid(snakeNumSpinner, 5, 1);
+        gridBag.addInGrid(upCtrlLabel, 6, 0);
+        gridBag.addInGrid(dirCtrlFields[0], 6, 1);
+        gridBag.addInGrid(downCtrlLabel, 7, 0);
+        gridBag.addInGrid(dirCtrlFields[1], 7, 1);
+        gridBag.addInGrid(leftCtrlLabel, 8, 0);
+        gridBag.addInGrid(dirCtrlFields[2], 8, 1);
+        gridBag.addInGrid(rightCtrlLabel, 9, 0);
+        gridBag.addInGrid(dirCtrlFields[3], 9, 1);
 
-        add(gridBag, "settings card");
-    }
-
-    private GridBagConstraints constraint(int y, int x) {
-        return constraint(y, x, 1);
-    }
-
-    private GridBagConstraints constraint(int y, int x, int w) {
-        return constraint(y, x, w, null);
-    }
-
-    private GridBagConstraints constraint(int y, int x, int w, Insets padding) {
-        GridBagConstraints constraint = new GridBagConstraints();
-        constraint.fill = GridBagConstraints.HORIZONTAL;
-        constraint.gridy = y;
-        constraint.gridx = x;
-        constraint.gridwidth = w;
-        if (padding != null) constraint.insets = padding;
-        return constraint;
+        mainPanel.add(gridBag, "settings card");
     }
 
     private void toMainMenuCard() {
-        cardLayout.show(this, "main menu card");
+        cardLayout.show(mainPanel, "main menu card");
         newGameButton.requestFocus();
     }
 
@@ -201,12 +184,12 @@ public class MenuPanel extends JPanel {
         playerSnakeSpinner.setModel(new SpinnerNumberModel(1, 0, maxSnakeCount, 1));
         botSnakeSpinner.setModel(new SpinnerNumberModel(0, 0, maxSnakeCount, 1));
 
-        cardLayout.show(this, "new game card");
+        cardLayout.show(mainPanel, "new game card");
         startGameButton.requestFocus();
     }
 
     private void toSettingsCard() {
-        cardLayout.show(this, "settings card");
+        cardLayout.show(mainPanel, "settings card");
         toMainButton2.requestFocus();
     }
 
@@ -272,14 +255,14 @@ public class MenuPanel extends JPanel {
         }
 
         gamePanel.initLoop();
-        owner.changePanel(gamePanel);
+        owner.changePanel(gamePanel.mainPanel);
     }
 
-    private class ctrlInput extends KeyAdapter {
+    private class CtrlInput extends KeyAdapter {
 
         int dirIndex;
 
-        private ctrlInput(int setDirIndex) {
+        private CtrlInput(int setDirIndex) {
             dirIndex = setDirIndex;
         }
 
@@ -303,11 +286,12 @@ public class MenuPanel extends JPanel {
         }
     }
 
-    private class ctrlInputFocus implements FocusListener {
+    // Class for giving visual indication of when JTextField is focused on (CtrlInput class helps with this)
+    private class CtrlInputFocus implements FocusListener {
 
         int dirIndex;
 
-        private ctrlInputFocus(int setDirIndex) {
+        private CtrlInputFocus(int setDirIndex) {
             dirIndex = setDirIndex;
         }
 
