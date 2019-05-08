@@ -5,8 +5,7 @@ import java.awt.Color
 import com.JavaSnakes.util.Direction
 import com.JavaSnakes.util.GridPos
 
-class BotSnake(initDirection: Direction, initPos: GridPos, setColor: Color) : SnakeBase(initDirection, initPos, setColor) {
-
+class BotSnake(initDir: Direction, initPos: GridPos, setColor: Color) : SnakeBase(initDir, initPos, setColor) {
     override fun processDirection() {
         val dirPriority: Array<Direction> = Array(4) { Direction.Up }
 

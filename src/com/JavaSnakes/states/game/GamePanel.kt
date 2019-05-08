@@ -149,7 +149,6 @@ class GamePanel(
     }
 
     private inner class MainGamePanel : JPanel() {
-
         init {
             addKeyListener(Input())
             background = Color.darkGray
@@ -237,7 +236,6 @@ class GamePanel(
         }
 
         private inner class Input : KeyAdapter() {
-
             override fun keyPressed(e: KeyEvent) {
                 val key = e.keyCode
 

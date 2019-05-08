@@ -11,11 +11,7 @@ class MenuCard : JPanel() {
         layout = GridBagLayout()
     }
 
-    fun addInGrid(component: Component, y: Int, x: Int, padding: Insets) {
-        addInGrid(component, y, x, 1, padding)
-    }
-
-    @JvmOverloads fun addInGrid(component: Component, y: Int, x: Int, w: Int = 1, padding: Insets? = null) {
+    fun addInGrid(component: Component, y: Int, x: Int, w: Int = 1, padding: Insets? = null) {
         val constraint = GridBagConstraints()
         constraint.fill = GridBagConstraints.HORIZONTAL
         constraint.gridy = y

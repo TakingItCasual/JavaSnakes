@@ -1,15 +1,6 @@
 package com.JavaSnakes.util
 
-class GridPos {
-
-    @JvmField var x: Int = 0
-    @JvmField var y: Int = 0
-
-    @JvmOverloads constructor(setX: Int = 0, setY: Int = 0) {
-        x = setX
-        y = setY
-    }
-
+class GridPos constructor(var x: Int = 0, var y: Int = 0) {
     constructor(other: GridPos): this(other.x, other.y)
 
     override fun equals(other: Any?): Boolean {

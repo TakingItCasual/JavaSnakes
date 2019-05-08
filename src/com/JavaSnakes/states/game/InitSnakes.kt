@@ -10,7 +10,6 @@ import java.awt.Color
 import java.util.ArrayList
 
 class InitSnakes(private val mapWidth: Int, private val mapHeight: Int) {
-
     val snakes: MutableList<SnakeBase>
 
     private val snakeInitDir: Direction

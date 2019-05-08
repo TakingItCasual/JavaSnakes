@@ -26,7 +26,7 @@ import javax.swing.SpinnerNumberModel
 import javax.swing.SwingConstants
 
 class MenuPanel(private val owner: Main) {
-    @JvmField val mainPanel: JPanel = JPanel()
+    val mainPanel: JPanel = JPanel()
 
     private val cardLayout: CardLayout
 
@@ -93,9 +93,9 @@ class MenuPanel(private val owner: Main) {
         val gridBag = MenuCard()
         gridBag.addInGrid(startGameButton, 0, 0, 2)
         gridBag.addInGrid(playerSnakeCountLabel, 1, 0)
-        gridBag.addInGrid(playerSnakeSpinner, 1, 1, Insets(0, 5, 0, 0))
+        gridBag.addInGrid(playerSnakeSpinner, 1, 1, padding = Insets(0, 5, 0, 0))
         gridBag.addInGrid(botSnakeCountLabel, 2, 0)
-        gridBag.addInGrid(botSnakeSpinner, 2, 1, Insets(0, 5, 0, 0))
+        gridBag.addInGrid(botSnakeSpinner, 2, 1, padding = Insets(0, 5, 0, 0))
         gridBag.addInGrid(wallCheckBox, 3, 0, 2)
         gridBag.addInGrid(toMainButton1, 4, 0, 2)
 
@@ -244,7 +244,6 @@ class MenuPanel(private val owner: Main) {
     }
 
     private inner class CtrlInput constructor(internal var dirIndex: Int) : KeyAdapter() {
-
         override fun keyPressed(e: KeyEvent) {
             val key = e.keyCode
             if (key == KeyEvent.VK_ESCAPE || key == KeyEvent.VK_SPACE) return
@@ -266,7 +265,6 @@ class MenuPanel(private val owner: Main) {
 
     // Class for giving visual indication of when JTextField is focused on (CtrlInput class helps with this)
     private inner class CtrlInputFocus constructor(internal var dirIndex: Int) : FocusListener {
-
         override fun focusGained(e: FocusEvent) {
             dirCtrlFields[dirIndex].text = " " + dirCtrlFields[dirIndex].text.trim()
         }

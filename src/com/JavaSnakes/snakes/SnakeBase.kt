@@ -15,15 +15,15 @@ abstract class SnakeBase internal constructor(protected var direction: Direction
         private val NEXT_ID = AtomicInteger(1)
 
         private const val initLength = 3
-        @JvmField var board: Board? = null
+        var board: Board? = null
     }
 
     val id: Int
 
-    @JvmField var status: Status
-    @JvmField var coords: LinkedList<GridPos>
-    protected var length: Int = 0
-    @JvmField var score: Int = 0
+    var status: Status
+    var coords: LinkedList<GridPos>
+    private var length: Int = 0
+    var score: Int = 0
 
     init {
         id = NEXT_ID.getAndIncrement()
