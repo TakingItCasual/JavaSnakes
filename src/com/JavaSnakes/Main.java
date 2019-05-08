@@ -1,6 +1,6 @@
 package com.JavaSnakes;
 
-import com.JavaSnakes.panels.MenuPanel;
+import com.JavaSnakes.states.menu.MenuPanel;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;

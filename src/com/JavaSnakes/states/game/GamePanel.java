@@ -1,12 +1,12 @@
-package com.JavaSnakes.panels;
+package com.JavaSnakes.states.game;
 
 import com.JavaSnakes.Board;
 import com.JavaSnakes.Main;
-import com.JavaSnakes.snakes.BotSnake;
 import com.JavaSnakes.snakes.PlayerSnake;
 import com.JavaSnakes.snakes.SnakeBase;
-import com.JavaSnakes.util.Direction;
+import com.JavaSnakes.states.menu.MenuPanel;
 import com.JavaSnakes.util.GridPos;
+import com.JavaSnakes.util.MenuCard;
 
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -14,13 +14,13 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Iterator;
+import java.util.List;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class GamePanel implements Runnable {
@@ -31,10 +31,11 @@ public class GamePanel implements Runnable {
     private CardLayout cardLayout;
 
     private MainGamePanel mainGamePanel;
-    private JPanel escapePanel;
 
     private JButton continueButton;
     private JButton quitToMenuButton;
+
+    private JButton backToMainButton;
 
     private final int delay;
 
@@ -47,7 +48,15 @@ public class GamePanel implements Runnable {
     private boolean inGame;
     private Thread animator;
 
-    public GamePanel(Main setOwner, int setDelay, int setCellSize) {
+    public GamePanel(
+            Main setOwner,
+            int setDelay,
+            int setCellSize,
+            int setMapW,
+            int setMapH,
+            boolean includeWalls,
+            List<SnakeBase> setSnakes
+    ) {
         owner = setOwner;
 
         mainPanel = new JPanel();
@@ -56,6 +65,7 @@ public class GamePanel implements Runnable {
         mainGamePanel = new MainGamePanel();
         mainPanel.add(mainGamePanel, "game card");
         createEscapeCard();
+        createEndCard();
 
         cardLayout = (CardLayout) mainPanel.getLayout();
 
@@ -64,30 +74,14 @@ public class GamePanel implements Runnable {
         cellSize = setCellSize;
         miniOffset = 1;
         miniCell = cellSize - 2 * miniOffset;
-    }
 
-    private void createEscapeCard() {
-        continueButton = new JButton("Continue");
-        continueButton.addActionListener(e -> toGameCard());
-        quitToMenuButton = new JButton("Quit to main menu");
-
-        JPanel buttonGrid = new JPanel(new GridLayout(2, 1));
-        buttonGrid.add(continueButton);
-        buttonGrid.add(quitToMenuButton);
-        escapePanel = new JPanel(new GridBagLayout());
-        escapePanel.add(buttonGrid);
-
-        mainPanel.add(escapePanel, "escape card");
-    }
-
-    public void initBoard(int setMapW, int setMapH, boolean includeWalls) {
         board = new Board(setMapW, setMapH, includeWalls);
+        mainPanel.setPreferredSize(new Dimension(board.width * cellSize, board.height * cellSize));
         SnakeBase.board = board;
 
-        mainPanel.setPreferredSize(new Dimension(board.width * cellSize, board.height * cellSize));
-    }
+        board.snakes.addAll(setSnakes);
+        board.liveSnakes.addAll(setSnakes);
 
-    public void initLoop() {
         board.createFood();
 
         inGame = true;
@@ -95,45 +89,33 @@ public class GamePanel implements Runnable {
         animator.start();
     }
 
-    public void createPlayerSnake(Color snakeColor, int ctrlUp, int ctrlDown, int ctrlLeft, int ctrlRight) {
-        board.snakes.add(new PlayerSnake(
-            getSnakeInitDir(), getSnakeInitPos(), snakeColor,
-            ctrlUp, ctrlDown, ctrlLeft, ctrlRight
-        ));
-        board.liveSnakes.add(board.snakes.get(board.snakes.size() - 1));
+    private void createEscapeCard() {
+        continueButton = new JButton("Continue");
+        continueButton.addActionListener(e -> toGameCard());
+        quitToMenuButton = new JButton("Quit to main menu");
+        quitToMenuButton.addActionListener(e -> toMainMenu());
+
+        MenuCard gridBag = new MenuCard();
+        gridBag.addInGrid(continueButton, 0, 0);
+        gridBag.addInGrid(quitToMenuButton, 1, 0);
+
+        mainPanel.add(gridBag, "escape card");
     }
 
-    public void createBotSnake(Color snakeColor) {
-        board.snakes.add(new BotSnake(getSnakeInitDir(), getSnakeInitPos(), snakeColor));
-        board.liveSnakes.add(board.snakes.get(board.snakes.size() - 1));
+    private void createEndCard() {
+        backToMainButton = new JButton("Back to main menu");
+        backToMainButton.addActionListener(e -> toMainMenu());
+        JLabel gameOverLabel = new JLabel("Game Over");
+
+        MenuCard gridBag = new MenuCard();
+        gridBag.addInGrid(backToMainButton, 0, 0);
+        gridBag.addInGrid(gameOverLabel, 1, 0);
+
+        mainPanel.add(gridBag, "end card");
     }
 
-    private Direction getSnakeInitDir() {
-        if (board.snakes.size() % 4 == 0) {
-            return Direction.Right;
-        } else if (board.snakes.size() % 4 == 1) {
-            return Direction.Left;
-        } else if (board.snakes.size() % 4 == 2) {
-            return Direction.Down;
-        } else {
-            return Direction.Up;
-        }
-    }
-
-    private GridPos getSnakeInitPos() {
-        int snakeCount = board.snakes.size();
-        int extra = snakeCount / 4;
-
-        int initPosX = 3 + 3 * extra;
-        int initPosY = 3 + 3 * extra;
-        if (snakeCount % 4 == 1 || snakeCount % 4 == 2) {
-            initPosX = board.width - 4 - 3 * extra;
-        }
-        if (snakeCount % 4 == 1 || snakeCount % 4 == 3) {
-            initPosY = board.height - 4 - 3 * extra;
-        }
-
-        return new GridPos(initPosX, initPosY);
+    private void toMainMenu() {
+        owner.changePanel(new MenuPanel(owner).mainPanel);
     }
 
     private void toGameCard() {

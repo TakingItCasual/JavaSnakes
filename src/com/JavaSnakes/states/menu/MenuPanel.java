@@ -1,6 +1,8 @@
-package com.JavaSnakes.panels;
+package com.JavaSnakes.states.menu;
 
 import com.JavaSnakes.Main;
+import com.JavaSnakes.states.game.GamePanel;
+import com.JavaSnakes.states.game.InitSnakes;
 import com.JavaSnakes.util.MenuCard;
 
 import java.awt.CardLayout;
@@ -105,9 +107,9 @@ public class MenuPanel {
         MenuCard gridBag = new MenuCard();
         gridBag.addInGrid(startGameButton, 0, 0, 2);
         gridBag.addInGrid(playerSnakeCountLabel, 1, 0);
-        gridBag.addInGrid(playerSnakeSpinner, 1, 1, 1, new Insets(0, 5, 0, 0));
+        gridBag.addInGrid(playerSnakeSpinner, 1, 1, new Insets(0, 5, 0, 0));
         gridBag.addInGrid(botSnakeCountLabel, 2, 0);
-        gridBag.addInGrid(botSnakeSpinner, 2, 1, 1, new Insets(0, 5, 0, 0));
+        gridBag.addInGrid(botSnakeSpinner, 2, 1, new Insets(0, 5, 0, 0));
         gridBag.addInGrid(wallCheckBox, 3, 0, 2);
         gridBag.addInGrid(toMainButton1, 4, 0, 2);
 
@@ -236,25 +238,25 @@ public class MenuPanel {
     }
 
     private void startGame() {
-        GamePanel gamePanel = new GamePanel(owner, (int) frameDelaySpinner.getValue(), 10);
+        int mapW = (int) mapWidthSpinner.getValue();
+        int mapH = (int) mapHeightSpinner.getValue();
 
-        gamePanel.initBoard(
-            (int) mapWidthSpinner.getValue(),
-            (int) mapHeightSpinner.getValue(),
-            wallCheckBox.isSelected()
-        );
-
+        InitSnakes initSnakes = new InitSnakes(mapW, mapH);
         for (int i = 0; i < (int) playerSnakeSpinner.getValue(); i++) {
-            gamePanel.createPlayerSnake(
-                Color.blue,
-                playerControls.get(i)[0], playerControls.get(i)[1], playerControls.get(i)[2], playerControls.get(i)[3]
+            initSnakes.addPlayerSnake(
+                    Color.blue,
+                    playerControls.get(i)[0],
+                    playerControls.get(i)[1],
+                    playerControls.get(i)[2],
+                    playerControls.get(i)[3]
             );
         }
-        for (int i = 0; i < (int) botSnakeSpinner.getValue(); i++) {
-            gamePanel.createBotSnake(Color.black);
-        }
+        initSnakes.addBotSnakes(Color.black, (int) botSnakeSpinner.getValue());
 
-        gamePanel.initLoop();
+        GamePanel gamePanel = new GamePanel(
+            owner, (int) frameDelaySpinner.getValue(), 10,
+            mapW, mapH, wallCheckBox.isSelected(), initSnakes.getSnakes()
+        );
         owner.changePanel(gamePanel.mainPanel);
     }
 

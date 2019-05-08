@@ -16,6 +16,10 @@ public class MenuCard extends JPanel {
         addInGrid(component, y, x, 1);
     }
 
+    public void addInGrid(Component component, int y, int x, Insets padding) {
+        addInGrid(component, y, x, 1, padding);
+    }
+
     public void addInGrid(Component component, int y, int x, int w) {
         addInGrid(component, y, x, w, null);
     }
