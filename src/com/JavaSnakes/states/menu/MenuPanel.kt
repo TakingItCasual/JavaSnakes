@@ -15,7 +15,6 @@ import java.awt.event.FocusListener
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.util.ArrayList
-import java.util.stream.IntStream
 import javax.swing.JButton
 import javax.swing.JCheckBox
 import javax.swing.JLabel
@@ -121,9 +120,9 @@ class MenuPanel(private val owner: Main) {
         val leftCtrlLabel = JLabel("Left key:")
         val rightCtrlLabel = JLabel("Right key:")
 
-        for (i in dirCtrlFields.indices) {
-            dirCtrlFields[i].addKeyListener(CtrlInput(i))
-            dirCtrlFields[i].addFocusListener(CtrlInputFocus(i))
+        for ((i, dirCtrlField) in dirCtrlFields.withIndex()) {
+            dirCtrlField.addKeyListener(CtrlInput(i))
+            dirCtrlField.addFocusListener(CtrlInputFocus(i))
         }
 
         val fontFamily = dirCtrlFields[0].font.family
@@ -208,8 +207,8 @@ class MenuPanel(private val owner: Main) {
             }
         } else {
             playerControlsTemp = playerControls[playerNum - 1].clone()
-            for (i in dirCtrlFields.indices) {
-                dirCtrlFields[i].text = KeyEvent.getKeyText(playerControlsTemp[i])
+            for ((i, dirCtrlField) in dirCtrlFields.withIndex()) {
+                dirCtrlField.text = KeyEvent.getKeyText(playerControlsTemp[i])
             }
         }
     }
@@ -249,14 +248,14 @@ class MenuPanel(private val owner: Main) {
         override fun keyPressed(e: KeyEvent) {
             val key = e.keyCode
             if (key == KeyEvent.VK_ESCAPE || key == KeyEvent.VK_SPACE) return
-            if (IntStream.of(*playerControlsTemp).anyMatch { x -> x == key }) return
+            if (key in playerControlsTemp) return
 
             playerControlsTemp[dirIndex] = key
             dirCtrlFields[dirIndex].text = " " + KeyEvent.getKeyText(key)
 
             val playerNum = snakeNumSpinner.value as Int
             if (playerNum > playerControls.size) {
-                if (IntStream.of(*playerControlsTemp).noneMatch { x -> x == -1 }) {
+                if (-1 !in playerControlsTemp) {
                     playerControls.add(playerControlsTemp.clone())
                 }
             } else {
@@ -269,11 +268,11 @@ class MenuPanel(private val owner: Main) {
     private inner class CtrlInputFocus constructor(internal var dirIndex: Int) : FocusListener {
 
         override fun focusGained(e: FocusEvent) {
-            dirCtrlFields[dirIndex].text = " " + dirCtrlFields[dirIndex].text.trim { it <= ' ' }
+            dirCtrlFields[dirIndex].text = " " + dirCtrlFields[dirIndex].text.trim()
         }
 
         override fun focusLost(e: FocusEvent) {
-            dirCtrlFields[dirIndex].text = dirCtrlFields[dirIndex].text.trim { it <= ' ' }
+            dirCtrlFields[dirIndex].text = dirCtrlFields[dirIndex].text.trim()
         }
     }
 }
