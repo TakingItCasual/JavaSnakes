@@ -9,6 +9,18 @@ import javax.swing.SwingUtilities
 import javax.swing.UIManager
 
 class Main : JFrame() {
+    companion object {
+        @JvmStatic fun main(args: Array<String>) {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
+            } catch (e: java.lang.Exception) {
+                JOptionPane.showMessageDialog(null, "GUI Error")
+            }
+
+            SwingUtilities.invokeLater { Main() }
+        }
+    }
+
     init {
         title = "Snake"
         defaultCloseOperation = EXIT_ON_CLOSE
@@ -27,19 +39,5 @@ class Main : JFrame() {
         setLocationRelativeTo(null)
 
         isVisible = true
-    }
-
-    companion object {
-
-        @JvmStatic
-        fun main(args: Array<String>) {
-            try {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
-            } catch (e: java.lang.Exception) {
-                JOptionPane.showMessageDialog(null, "GUI Error")
-            }
-
-            SwingUtilities.invokeLater { Main() }
-        }
     }
 }

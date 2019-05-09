@@ -18,19 +18,14 @@ abstract class SnakeBase internal constructor(protected var direction: Direction
         var board: Board? = null
     }
 
-    val id: Int
+    val id: Int = NEXT_ID.getAndIncrement()
 
-    var status: Status
-    var coords: LinkedList<GridPos>
-    private var length: Int = 0
+    var status: Status = Status.Alive
+    val coords: LinkedList<GridPos> = LinkedList()
+    private var length: Int = initLength
     var score: Int = 0
 
     init {
-        id = NEXT_ID.getAndIncrement()
-
-        status = Status.Alive
-
-        coords = LinkedList()
         for (i in 0 until initLength) {
             coords.addLast(GridPos(initPos))
             if (direction === Direction.Up) initPos.y += 1
@@ -38,9 +33,6 @@ abstract class SnakeBase internal constructor(protected var direction: Direction
             if (direction === Direction.Left) initPos.x += 1
             if (direction === Direction.Right) initPos.x -= 1
         }
-
-        length = initLength
-        score = 0
     }
 
     fun moveHead() {
@@ -78,7 +70,7 @@ abstract class SnakeBase internal constructor(protected var direction: Direction
         return coords.first
     }
 
-    protected fun directionsAreOpposite(dir1: Direction, dir2: Direction) = dir1 == oppositeDirection(dir2)
+    protected fun directionsAreOpposite(dir1: Direction, dir2: Direction) = dir1 === oppositeDirection(dir2)
 
     private fun oppositeDirection(dir: Direction): Direction {
         return when (dir) {

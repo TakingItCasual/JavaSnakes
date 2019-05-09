@@ -46,6 +46,7 @@ class GamePanel(
     private val board: Board
 
     private var inGame: Boolean = false
+    private var isPaused: Boolean = false
     private val animator: Thread
 
     init {
@@ -101,12 +102,21 @@ class GamePanel(
     }
 
     private fun toGameCard() {
+        isPaused = false
         cardLayout.show(mainPanel, "game card")
+        mainGamePanel.requestFocus()
     }
 
     private fun toEscapeCard() {
+        isPaused = true
         cardLayout.show(mainPanel, "escape card")
         continueButton.requestFocus()
+    }
+
+    // TODO: Add scores
+    private fun toEndCard() {
+        cardLayout.show(mainPanel, "end card")
+        backToMainButton.requestFocus()
     }
 
     override fun run() {
@@ -116,11 +126,14 @@ class GamePanel(
         while (inGame) {
             beforeTime = System.currentTimeMillis()
 
-            gameLogic()
-            mainPanel.paintImmediately(mainPanel.bounds)
+            if (!isPaused) {
+                gameLogic()
+                mainPanel.paintImmediately(mainPanel.bounds)
+            }
 
             frameDelay(beforeTime)
         }
+        toEndCard()
     }
 
     private fun gameLogic() {
@@ -240,7 +253,7 @@ class GamePanel(
                 val key = e.keyCode
 
                 if (key == KeyEvent.VK_ESCAPE)
-                    System.exit(0)
+                    toEscapeCard()
 
                 for (snake in board.liveSnakes) {
                     if (snake !is PlayerSnake) continue
