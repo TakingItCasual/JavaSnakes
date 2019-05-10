@@ -7,7 +7,7 @@ import com.JavaSnakes.util.Status
 import java.util.ArrayList
 import java.util.concurrent.ThreadLocalRandom
 
-class Board(val width: Int, val height: Int, val isWalled: Boolean) {
+class Board(val width: Int, val height: Int, val isWalled: Boolean, setSnakes: List<SnakeBase>) {
     var walls: Array<BooleanArray> = Array(width) { BooleanArray(height) }
 
     var snakes: MutableList<SnakeBase> = ArrayList()
@@ -16,6 +16,8 @@ class Board(val width: Int, val height: Int, val isWalled: Boolean) {
     var foodPos: GridPos = GridPos()
 
     init {
+        SnakeBase.board = this
+
         if (isWalled) {
             for (x in 0 until width) {
                 for (y in 0 until height) {
@@ -23,6 +25,11 @@ class Board(val width: Int, val height: Int, val isWalled: Boolean) {
                 }
             }
         }
+
+        snakes.addAll(setSnakes)
+        liveSnakes.addAll(setSnakes)
+
+        createFood()
     }
 
     fun checkCollisions() {

@@ -19,6 +19,7 @@ import java.awt.event.KeyEvent
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.JScrollPane
 
 class GamePanel(
         private val owner: Main,
@@ -33,26 +34,26 @@ class GamePanel(
 
     private val cardLayout: CardLayout
 
-    private val mainGamePanel: MainGamePanel
+    private val mainGamePanel: MainGamePanel = MainGamePanel()
 
-    private var continueButton: JButton = JButton("Continue")
-    private var quitToMenuButton: JButton = JButton("Quit to main menu")
+    private val continueButton: JButton = JButton("Continue")
+    private val quitToMenuButton: JButton = JButton("Quit to main menu")
 
-    private var backToMainButton: JButton = JButton("Back to main menu")
+    private val endCard: MenuCard = MenuCard()
+    private val backToMainButton: JButton = JButton("Back to main menu")
 
     private val miniCell: Int
     private val miniOffset: Int
 
     private val board: Board
 
-    private var inGame: Boolean = false
+    private var inGame: Boolean = true
     private var isPaused: Boolean = false
     private val animator: Thread
 
     init {
         mainPanel.layout = CardLayout()
 
-        mainGamePanel = MainGamePanel()
         mainPanel.add(mainGamePanel, "game card")
         createEscapeCard()
         createEndCard()
@@ -61,16 +62,9 @@ class GamePanel(
         miniOffset = 1
         miniCell = cellSize - 2 * miniOffset
 
-        board = Board(setMapW, setMapH, includeWalls)
+        board = Board(setMapW, setMapH, includeWalls, setSnakes)
         mainPanel.preferredSize = Dimension(board.width * cellSize, board.height * cellSize)
-        SnakeBase.board = board
 
-        board.snakes.addAll(setSnakes)
-        board.liveSnakes.addAll(setSnakes)
-
-        board.createFood()
-
-        inGame = true
         animator = Thread(this)
         animator.start()
     }
@@ -88,13 +82,26 @@ class GamePanel(
 
     private fun createEndCard() {
         backToMainButton.addActionListener { toMainMenu() }
-        val gameOverLabel = JLabel("Game Over")
 
-        val gridBag = MenuCard()
-        gridBag.addInGrid(backToMainButton, 0, 0)
-        gridBag.addInGrid(gameOverLabel, 1, 0)
+        endCard.addInGrid(backToMainButton, 0, 0)
 
-        mainPanel.add(gridBag, "end card")
+        mainPanel.add(endCard, "end card")
+    }
+
+    private fun addScoresToEndCard() {
+        val labelList = MenuCard()
+        for ((i, snake) in board.snakes.withIndex()) {
+            val scoreLabel = JLabel("Snake " + snake.id + ": " + snake.score)
+            scoreLabel.font = Font(scoreLabel.font.family, Font.BOLD, 14)
+            scoreLabel.foreground = snake.color
+
+            labelList.addInGrid(scoreLabel, i, 0)
+        }
+
+        val scrollPane = JScrollPane(labelList)
+        scrollPane.minimumSize = Dimension(-1, mainGamePanel.height / 2)
+        // TODO: Figure out how to set scrollPane's background color
+        endCard.addInGrid(scrollPane, 1, 0)
     }
 
     private fun toMainMenu() {
@@ -113,8 +120,8 @@ class GamePanel(
         continueButton.requestFocus()
     }
 
-    // TODO: Add scores
     private fun toEndCard() {
+        addScoresToEndCard()
         cardLayout.show(mainPanel, "end card")
         backToMainButton.requestFocus()
     }
@@ -175,8 +182,6 @@ class GamePanel(
                 drawFood(g)
                 drawSnakes(g)
                 drawWalls(g)
-            } else {
-                drawGameOver(g)
             }
 
             Toolkit.getDefaultToolkit().sync()
@@ -221,31 +226,6 @@ class GamePanel(
 
         private fun drawMiniSquare(g: Graphics, coord: GridPos) {
             g.fillRect(coord.x * cellSize + miniOffset, coord.y * cellSize + miniOffset, miniCell, miniCell)
-        }
-
-        private fun drawGameOver(g: Graphics) {
-            val small = Font("Helvetica", Font.BOLD, 14)
-            val metr = getFontMetrics(small)
-
-            g.color = Color.white
-            g.font = small
-            val fontHeight = g.fontMetrics.height
-
-            val msgs = arrayOfNulls<String>(board.snakes.size + 1)
-            msgs[0] = "Game Over"
-            for (i in board.snakes.indices) {
-                msgs[i + 1] = "Snake " + board.snakes[i].id + ": " + board.snakes[i].score
-            }
-
-            val yOffset = fontHeight * (board.snakes.size / 2)
-            for (i in msgs.indices) {
-                if (i > 0) g.color = board.snakes[i - 1].color
-                g.drawString(
-                    msgs[i],
-                    (width - metr.stringWidth(msgs[i])) / 2,
-                    height / 2 - yOffset + i * fontHeight
-                )
-            }
         }
 
         private inner class Input : KeyAdapter() {

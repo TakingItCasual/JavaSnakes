@@ -28,25 +28,29 @@ abstract class SnakeBase internal constructor(protected var direction: Direction
     init {
         for (i in 0 until initLength) {
             coords.addLast(GridPos(initPos))
-            if (direction === Direction.Up) initPos.y += 1
-            if (direction === Direction.Down) initPos.y -= 1
-            if (direction === Direction.Left) initPos.x += 1
-            if (direction === Direction.Right) initPos.x -= 1
+            when (direction) {
+                Direction.Up -> initPos.y += 1
+                Direction.Down -> initPos.y -= 1
+                Direction.Left -> initPos.x += 1
+                Direction.Right -> initPos.x -= 1
+            }
         }
     }
 
     fun moveHead() {
         val newHead = GridPos(headPos())
 
-        if (direction === Direction.Up) newHead.y -= 1
-        if (direction === Direction.Down) newHead.y += 1
-        if (direction === Direction.Left) newHead.x -= 1
-        if (direction === Direction.Right) newHead.x += 1
+        when (direction) {
+            Direction.Up -> newHead.y -= 1
+            Direction.Down -> newHead.y += 1
+            Direction.Left -> newHead.x -= 1
+            Direction.Right -> newHead.x += 1
+        }
 
         if (newHead.x < 0) newHead.x = board!!.width - 1
-        if (newHead.x >= board!!.width) newHead.x = 0
+        else if (newHead.x >= board!!.width) newHead.x = 0
         if (newHead.y < 0) newHead.y = board!!.height - 1
-        if (newHead.y >= board!!.height) newHead.y = 0
+        else if (newHead.y >= board!!.height) newHead.y = 0
 
         coords.addFirst(newHead)
     }
