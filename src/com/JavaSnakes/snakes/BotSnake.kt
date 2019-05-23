@@ -4,10 +4,18 @@ import java.awt.Color
 
 import com.JavaSnakes.util.Direction
 import com.JavaSnakes.util.GridPos
+import java.util.concurrent.atomic.AtomicInteger
 
 class BotSnake(initDir: Direction, initPos: GridPos, setColor: Color) : SnakeBase(initDir, initPos, setColor) {
+    companion object {
+        private val NEXT_ID = AtomicInteger(1)
+    }
+
+    override val groupName = "Bot"
+    override val idInGroup = NEXT_ID.getAndIncrement()
+
     override fun processDirection() {
-        val dirPriority: Array<Direction> = Array(4) { Direction.Up }
+        val dirPriority = Array(4) { Direction.Up }
 
         var diffX = board!!.foodPos.x - headPos().x
         var diffY = board!!.foodPos.y - headPos().y

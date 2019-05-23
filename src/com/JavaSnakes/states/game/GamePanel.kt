@@ -5,6 +5,7 @@ import com.JavaSnakes.Main
 import com.JavaSnakes.snakes.PlayerSnake
 import com.JavaSnakes.snakes.SnakeBase
 import com.JavaSnakes.states.menu.MenuPanel
+import com.JavaSnakes.util.asOrdinal
 import com.JavaSnakes.util.GridPos
 import com.JavaSnakes.util.MenuCard
 
@@ -13,9 +14,11 @@ import java.awt.Color
 import java.awt.Dimension
 import java.awt.Font
 import java.awt.Graphics
+import java.awt.Insets
 import java.awt.Toolkit
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
+import javax.swing.BorderFactory
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -30,25 +33,25 @@ class GamePanel(
         includeWalls: Boolean,
         setSnakes: List<SnakeBase>
 ) : Runnable {
-    var mainPanel: JPanel = JPanel()
+    var mainPanel = JPanel()
 
     private val cardLayout: CardLayout
 
-    private val mainGamePanel: MainGamePanel = MainGamePanel()
+    private val mainGamePanel = MainGamePanel()
 
-    private val continueButton: JButton = JButton("Continue")
-    private val quitToMenuButton: JButton = JButton("Quit to main menu")
+    private val continueButton = JButton("Continue")
+    private val quitToMenuButton = JButton("Quit to main menu")
 
-    private val endCard: MenuCard = MenuCard()
-    private val backToMainButton: JButton = JButton("Back to main menu")
+    private val endCard = MenuCard()
+    private val backToMainButton = JButton("Back to main menu")
 
     private val miniCell: Int
     private val miniOffset: Int
 
     private val board: Board
 
-    private var inGame: Boolean = true
-    private var isPaused: Boolean = false
+    private var inGame = true
+    private var isPaused = false
     private val animator: Thread
 
     init {
@@ -89,16 +92,30 @@ class GamePanel(
     }
 
     private fun addScoresToEndCard() {
-        val labelList = MenuCard()
-        for ((i, snake) in board.snakes.withIndex()) {
-            val scoreLabel = JLabel("Snake " + snake.id + ": " + snake.score)
-            scoreLabel.font = Font(scoreLabel.font.family, Font.BOLD, 14)
-            scoreLabel.foreground = snake.color
+        val scoreSortedSnakes = board.snakes.sortedWith(
+            compareBy<SnakeBase> { -it.score }.thenByDescending { it.groupName }.thenBy { it.idInGroup })
+        val scoreSet = scoreSortedSnakes.map { it.score }.toSet()
 
-            labelList.addInGrid(scoreLabel, i, 0)
+        val labelList = MenuCard()
+        val font = Font(JLabel().font.family, Font.BOLD, 14)
+        for ((i, snake) in scoreSortedSnakes.withIndex()) {
+            val placingLabel = JLabel((scoreSet.indexOf(snake.score) + 1).asOrdinal())
+            placingLabel.font = font
+            labelList.addInGrid(placingLabel, i, 0, padding = Insets(0, 10, 0, 0))
+
+            val nameLabel = JLabel(snake.groupName + " " + snake.idInGroup)
+            nameLabel.font = font
+            nameLabel.foreground = snake.color
+            labelList.addInGrid(nameLabel, i, 1, padding = Insets(0, 10, 0, 10))
+
+            val scoreLabel = JLabel(snake.score.toString())
+            scoreLabel.font = font
+            scoreLabel.foreground = snake.color
+            labelList.addInGrid(scoreLabel, i, 2, padding = Insets(0, 0, 0, 10))
         }
 
         val scrollPane = JScrollPane(labelList)
+        scrollPane.border = BorderFactory.createEmptyBorder()
         scrollPane.minimumSize = Dimension(-1, mainGamePanel.height / 2)
         // TODO: Figure out how to set scrollPane's background color
         endCard.addInGrid(scrollPane, 1, 0)

@@ -5,6 +5,7 @@ import java.util.HashMap
 
 import com.JavaSnakes.util.Direction
 import com.JavaSnakes.util.GridPos
+import java.util.concurrent.atomic.AtomicInteger
 
 class PlayerSnake(
         private var directionBuffer: Direction,
@@ -15,6 +16,13 @@ class PlayerSnake(
         ctrlLeft: Int,
         ctrlRight: Int
 ) : SnakeBase(directionBuffer, initPos, setColor) {
+    companion object {
+        private val NEXT_ID = AtomicInteger(1)
+    }
+
+    override val groupName = "Player"
+    override val idInGroup = NEXT_ID.getAndIncrement()
+
     private val ctrlKeys: HashMap<Int, Direction> = HashMap()
 
     init {

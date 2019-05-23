@@ -8,12 +8,12 @@ import java.util.ArrayList
 import java.util.concurrent.ThreadLocalRandom
 
 class Board(val width: Int, val height: Int, val isWalled: Boolean, setSnakes: List<SnakeBase>) {
-    var walls: Array<BooleanArray> = Array(width) { BooleanArray(height) }
+    var walls = Array(width) { BooleanArray(height) }
 
     var snakes: MutableList<SnakeBase> = ArrayList()
     var liveSnakes: MutableList<SnakeBase> = ArrayList()
 
-    var foodPos: GridPos = GridPos()
+    var foodPos = GridPos()
 
     init {
         SnakeBase.board = this

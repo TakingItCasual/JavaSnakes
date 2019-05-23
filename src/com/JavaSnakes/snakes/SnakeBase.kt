@@ -8,22 +8,20 @@ import com.JavaSnakes.util.Status
 import java.awt.Color
 import java.util.Collections
 import java.util.LinkedList
-import java.util.concurrent.atomic.AtomicInteger
 
 abstract class SnakeBase internal constructor(protected var direction: Direction, initPos: GridPos, var color: Color) {
     companion object {
-        private val NEXT_ID = AtomicInteger(1)
-
         private const val initLength = 3
         var board: Board? = null
     }
 
-    val id: Int = NEXT_ID.getAndIncrement()
+    abstract val groupName: String
+    abstract val idInGroup: Int
 
-    var status: Status = Status.Alive
+    var status = Status.Alive
     val coords: LinkedList<GridPos> = LinkedList()
-    private var length: Int = initLength
-    var score: Int = 0
+    private var length = initLength
+    var score = 0
 
     init {
         for (i in 0 until initLength) {

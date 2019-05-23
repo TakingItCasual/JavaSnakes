@@ -26,30 +26,30 @@ import javax.swing.SpinnerNumberModel
 import javax.swing.SwingConstants
 
 class MenuPanel(private val owner: Main) {
-    val mainPanel: JPanel = JPanel()
+    val mainPanel = JPanel()
 
     private val cardLayout: CardLayout
 
-    private val newGameButton: JButton = JButton("New Game")
-    private val settingsButton: JButton = JButton("Settings")
-    private val quitButton: JButton = JButton("Quit")
+    private val newGameButton = JButton("New Game")
+    private val settingsButton = JButton("Settings")
+    private val quitButton = JButton("Quit")
 
-    private val startGameButton: JButton = JButton("Start Game")
-    private val playerSnakeSpinner: JSpinner = JSpinner()
-    private val botSnakeSpinner: JSpinner = JSpinner()
-    private val wallCheckBox: JCheckBox = JCheckBox("Include walls")
-    private val toMainButton1: JButton = JButton("Back")
+    private val startGameButton = JButton("Start Game")
+    private val playerSnakeSpinner = JSpinner()
+    private val botSnakeSpinner = JSpinner()
+    private val wallCheckBox = JCheckBox("Include walls")
+    private val toMainButton1 = JButton("Back")
 
-    private val toMainButton2: JButton = JButton("Back")
-    private val mapWidthSpinner: JSpinner = JSpinner()
-    private val mapHeightSpinner: JSpinner = JSpinner()
-    private val frameDelaySpinner: JSpinner = JSpinner()
-    private val snakeNumSpinner: JSpinner = JSpinner()
-    private val dirCtrlFields: Array<JTextField> = Array(4) { JTextField("") }
+    private val toMainButton2 = JButton("Back")
+    private val mapWidthSpinner = JSpinner()
+    private val mapHeightSpinner = JSpinner()
+    private val frameDelaySpinner = JSpinner()
+    private val snakeNumSpinner = JSpinner()
+    private val dirCtrlFields = Array(4) { JTextField("") }
 
-    private var maxSnakeCount: Int = 0
+    private var maxSnakeCount = 0
     private val playerControls: MutableList<IntArray>
-    private var playerControlsTemp: IntArray = IntArray(4)
+    private var playerControlsTemp = IntArray(4)
 
     init {
         mainPanel.layout = CardLayout()
@@ -125,11 +125,10 @@ class MenuPanel(private val owner: Main) {
             dirCtrlField.addFocusListener(CtrlInputFocus(i))
         }
 
-        val fontFamily = dirCtrlFields[0].font.family
-        val fontSize = dirCtrlFields[0].font.size
+        val font = Font(dirCtrlFields[0].font.family, Font.BOLD, dirCtrlFields[0].font.size)
         for (dirCtrlField in dirCtrlFields) {
             dirCtrlField.isEditable = false
-            dirCtrlField.font = Font(fontFamily, Font.BOLD, fontSize)
+            dirCtrlField.font = font
         }
 
         snakeNumChanged() // Fill out player settings with first player's info
