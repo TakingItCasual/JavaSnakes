@@ -9,46 +9,35 @@ import java.awt.Color
 import java.util.Collections
 import java.util.LinkedList
 
-abstract class SnakeBase internal constructor(protected var direction: Direction, initPos: GridPos, var color: Color) {
+abstract class SnakeBase internal constructor(
+        protected var direction: Direction,
+        var initPos: GridPos,
+        var color: Color
+) {
     companion object {
         private const val initLength = 3
         var board: Board? = null
     }
 
-    abstract val groupName: String
+    abstract val groupName: String // TODO: Abstract static properties?
     abstract val idInGroup: Int
 
     var status = Status.Alive
     val coords: LinkedList<GridPos> = LinkedList()
     private var length = initLength
     var score = 0
+        private set
 
     init {
         for (i in 0 until initLength) {
             coords.addLast(GridPos(initPos))
-            when (direction) {
-                Direction.Up -> initPos.y += 1
-                Direction.Down -> initPos.y -= 1
-                Direction.Left -> initPos.x += 1
-                Direction.Right -> initPos.x -= 1
-            }
+            initPos = initPos.nextPos(direction.opposite())
         }
     }
 
     fun moveHead() {
-        val newHead = GridPos(headPos())
-
-        when (direction) {
-            Direction.Up -> newHead.y -= 1
-            Direction.Down -> newHead.y += 1
-            Direction.Left -> newHead.x -= 1
-            Direction.Right -> newHead.x += 1
-        }
-
-        if (newHead.x < 0) newHead.x = board!!.width - 1
-        else if (newHead.x >= board!!.width) newHead.x = 0
-        if (newHead.y < 0) newHead.y = board!!.height - 1
-        else if (newHead.y >= board!!.height) newHead.y = 0
+        val newHead = headPos().nextPos(direction)
+        newHead.normalize(board!!.width, board!!.height)
 
         coords.addFirst(newHead)
     }
@@ -70,17 +59,6 @@ abstract class SnakeBase internal constructor(protected var direction: Direction
 
     fun headPos(): GridPos {
         return coords.first
-    }
-
-    protected fun directionsAreOpposite(dir1: Direction, dir2: Direction) = dir1 === oppositeDirection(dir2)
-
-    private fun oppositeDirection(dir: Direction): Direction {
-        return when (dir) {
-            Direction.Up -> Direction.Down
-            Direction.Down -> Direction.Up
-            Direction.Left -> Direction.Right
-            Direction.Right -> Direction.Left
-        }
     }
 
     abstract fun processDirection()

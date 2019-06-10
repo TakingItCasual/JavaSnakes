@@ -35,7 +35,7 @@ class PlayerSnake(
     }
 
     override fun processDirection() {
-        if (!directionsAreOpposite(direction, directionBuffer)) {
+        if (!direction.isOppositeOf(directionBuffer)) {
             direction = directionBuffer
         }
         directionBuffer = direction

@@ -83,18 +83,9 @@ class Board(val width: Int, val height: Int, val isWalled: Boolean, setSnakes: L
         }
     }
 
-    fun tileObstructed(x: Int, y: Int): Boolean {
-        return tileObstructed(GridPos(x, y))
-    }
-
     fun tileObstructed(coord: GridPos): Boolean {
-        normalizePos(coord)
+        coord.normalize(width, height)
         return tileHasWall(coord) || tileHasSnake(coord)
-    }
-
-    private fun normalizePos(coord: GridPos) {
-        coord.x = Math.floorMod(coord.x, width)
-        coord.y = Math.floorMod(coord.y, height)
     }
 
     private fun tileHasWall(coord: GridPos): Boolean {

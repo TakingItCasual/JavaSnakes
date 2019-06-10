@@ -118,6 +118,7 @@ class GamePanel(
         scrollPane.border = BorderFactory.createEmptyBorder()
         scrollPane.minimumSize = Dimension(-1, mainGamePanel.height / 2)
         // TODO: Figure out how to set scrollPane's background color
+        // TODO: Figure out how to properly disable the horizontal scrollbar
         endCard.addInGrid(scrollPane, 1, 0)
     }
 

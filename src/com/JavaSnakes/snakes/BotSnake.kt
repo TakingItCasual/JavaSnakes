@@ -86,20 +86,15 @@ class BotSnake(initDir: Direction, initPos: GridPos, setColor: Color) : SnakeBas
             }
         }
 
-        for (tempDir in dirPriority) {
-            if (directionsAreOpposite(direction, tempDir)) continue
-            if (nextTileObstructed(tempDir)) continue
-            direction = tempDir
+        for (potentialDir in dirPriority) {
+            if (direction.isOppositeOf(potentialDir)) continue
+            if (nextTileObstructed(potentialDir)) continue
+            direction = potentialDir
             break
         }
     }
 
     private fun nextTileObstructed(dir: Direction): Boolean {
-        return when (dir) {
-            Direction.Up -> board!!.tileObstructed(headPos().x, headPos().y - 1)
-            Direction.Down -> board!!.tileObstructed(headPos().x, headPos().y + 1)
-            Direction.Left -> board!!.tileObstructed(headPos().x - 1, headPos().y)
-            Direction.Right -> board!!.tileObstructed(headPos().x + 1, headPos().y)
-        }
+        return board!!.tileObstructed(headPos().nextPos(dir))
     }
 }
