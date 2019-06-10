@@ -36,9 +36,7 @@ abstract class SnakeBase internal constructor(
     }
 
     fun moveHead() {
-        val newHead = headPos().nextPos(direction)
-        newHead.normalize(board!!.width, board!!.height)
-
+        val newHead = headPos().nextPos(direction).normalized(board!!.width, board!!.height)
         coords.addFirst(newHead)
     }
 

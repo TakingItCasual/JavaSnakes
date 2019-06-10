@@ -3,11 +3,7 @@ package com.JavaSnakes.util
 class GridPos constructor(var x: Int = 0, var y: Int = 0) {
     constructor(other: GridPos): this(other.x, other.y)
 
-    fun normalize(mapWidth: Int, mapHeight: Int) {
-        x = Math.floorMod(x, mapWidth)
-        y = Math.floorMod(y, mapHeight)
-    }
-
+    // TODO: Combined nextPos and normalized method
     fun nextPos(dir: Direction): GridPos {
         return when (dir) {
             Direction.Up -> GridPos(x, y - 1)
@@ -15,6 +11,12 @@ class GridPos constructor(var x: Int = 0, var y: Int = 0) {
             Direction.Left -> GridPos(x - 1, y)
             Direction.Right -> GridPos(x + 1, y)
         }
+    }
+
+    fun normalized(boardWidth: Int, boardHeight: Int): GridPos {
+        val newX = Math.floorMod(x, boardWidth)
+        val newY = Math.floorMod(y, boardHeight)
+        return GridPos(newX, newY)
     }
 
     override fun equals(other: Any?): Boolean {

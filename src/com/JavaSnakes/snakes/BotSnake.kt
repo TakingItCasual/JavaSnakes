@@ -89,12 +89,26 @@ class BotSnake(initDir: Direction, initPos: GridPos, setColor: Color) : SnakeBas
         for (potentialDir in dirPriority) {
             if (direction.isOppositeOf(potentialDir)) continue
             if (nextTileObstructed(potentialDir)) continue
+            if (nextTileClaimed(potentialDir)) continue
             direction = potentialDir
             break
         }
     }
 
-    private fun nextTileObstructed(dir: Direction): Boolean {
-        return board!!.tileObstructed(headPos().nextPos(dir))
+    private fun nextTileObstructed(potentialDir: Direction): Boolean {
+        return board!!.tileObstructed(headPos().nextPos(potentialDir).normalized(board!!.width, board!!.height))
+    }
+
+    // Relies on snakes being ordered by ID in board.liveSnakes, and being processed in the same order
+    private fun nextTileClaimed(potentialDir: Direction): Boolean {
+        val thisNextPos = headPos().nextPos(potentialDir).normalized(board!!.width, board!!.height)
+        for (snake in board!!.liveSnakes) {
+            if (snake !is BotSnake) continue
+            if (idInGroup <= snake.idInGroup) break
+
+            val otherNextPos = snake.headPos().nextPos(snake.direction).normalized(board!!.width, board!!.height)
+            if (thisNextPos == otherNextPos) return true
+        }
+        return false
     }
 }
