@@ -15,7 +15,7 @@ class BotSnake(initDir: Direction, initPos: GridPos, setColor: Color) : SnakeBas
     override val idInGroup = NEXT_ID.getAndIncrement()
 
     override fun processDirection() {
-        val dirPriority = Array(4) { Direction.Up }
+        val dirByPriority = Array(4) { Direction.Up }
 
         var diffX = board!!.foodPos.x - headPos().x
         var diffY = board!!.foodPos.y - headPos().y
@@ -29,65 +29,65 @@ class BotSnake(initDir: Direction, initPos: GridPos, setColor: Color) : SnakeBas
         if (Math.abs(diffX) < Math.abs(diffY)) {
             if (diffX != 0) {
                 if (diffX > 0) {
-                    dirPriority[0] = Direction.Right
-                    dirPriority[3] = Direction.Left
+                    dirByPriority[0] = Direction.Right
+                    dirByPriority[3] = Direction.Left
                 } else {
-                    dirPriority[0] = Direction.Left
-                    dirPriority[3] = Direction.Right
+                    dirByPriority[0] = Direction.Left
+                    dirByPriority[3] = Direction.Right
                 }
                 if (diffY > 0) {
-                    dirPriority[1] = Direction.Down
-                    dirPriority[2] = Direction.Up
+                    dirByPriority[1] = Direction.Down
+                    dirByPriority[2] = Direction.Up
                 } else {
-                    dirPriority[1] = Direction.Up
-                    dirPriority[2] = Direction.Down
+                    dirByPriority[1] = Direction.Up
+                    dirByPriority[2] = Direction.Down
                 }
             } else {
                 if (diffY > 0) {
-                    dirPriority[0] = Direction.Down
-                    dirPriority[1] = Direction.Left
-                    dirPriority[2] = Direction.Right
-                    dirPriority[3] = Direction.Up
+                    dirByPriority[0] = Direction.Down
+                    dirByPriority[1] = Direction.Left
+                    dirByPriority[2] = Direction.Right
+                    dirByPriority[3] = Direction.Up
                 } else {
-                    dirPriority[0] = Direction.Up
-                    dirPriority[1] = Direction.Right
-                    dirPriority[2] = Direction.Left
-                    dirPriority[3] = Direction.Down
+                    dirByPriority[0] = Direction.Up
+                    dirByPriority[1] = Direction.Right
+                    dirByPriority[2] = Direction.Left
+                    dirByPriority[3] = Direction.Down
                 }
             }
         } else {
             if (diffY != 0) {
                 if (diffY > 0) {
-                    dirPriority[0] = Direction.Down
-                    dirPriority[3] = Direction.Up
+                    dirByPriority[0] = Direction.Down
+                    dirByPriority[3] = Direction.Up
                 } else {
-                    dirPriority[0] = Direction.Up
-                    dirPriority[3] = Direction.Down
+                    dirByPriority[0] = Direction.Up
+                    dirByPriority[3] = Direction.Down
                 }
                 if (diffX > 0) {
-                    dirPriority[1] = Direction.Right
-                    dirPriority[2] = Direction.Left
+                    dirByPriority[1] = Direction.Right
+                    dirByPriority[2] = Direction.Left
                 } else {
-                    dirPriority[1] = Direction.Left
-                    dirPriority[2] = Direction.Right
+                    dirByPriority[1] = Direction.Left
+                    dirByPriority[2] = Direction.Right
                 }
             } else {
                 if (diffX > 0) {
-                    dirPriority[0] = Direction.Right
-                    dirPriority[1] = Direction.Down
-                    dirPriority[2] = Direction.Up
-                    dirPriority[3] = Direction.Left
+                    dirByPriority[0] = Direction.Right
+                    dirByPriority[1] = Direction.Down
+                    dirByPriority[2] = Direction.Up
+                    dirByPriority[3] = Direction.Left
                 } else {
-                    dirPriority[0] = Direction.Left
-                    dirPriority[1] = Direction.Up
-                    dirPriority[2] = Direction.Down
-                    dirPriority[3] = Direction.Right
+                    dirByPriority[0] = Direction.Left
+                    dirByPriority[1] = Direction.Up
+                    dirByPriority[2] = Direction.Down
+                    dirByPriority[3] = Direction.Right
                 }
             }
         }
 
-        for (potentialDir in dirPriority) {
-            if (direction.isOppositeOf(potentialDir)) continue
+        val potentialDirs = dirByPriority.filterNot { it === direction.opposite()}
+        for (potentialDir in potentialDirs) {
             if (nextTileObstructed(potentialDir)) continue
             if (nextTileClaimed(potentialDir)) continue
             direction = potentialDir
@@ -99,7 +99,7 @@ class BotSnake(initDir: Direction, initPos: GridPos, setColor: Color) : SnakeBas
         return board!!.tileObstructed(headPos().nextPos(potentialDir).normalized(board!!.width, board!!.height))
     }
 
-    // Relies on snakes being ordered by ID in board.liveSnakes, and being processed in the same order
+    // Snakes must be ordered by ID in board.liveSnakes, and have their directions processed in the same order
     private fun nextTileClaimed(potentialDir: Direction): Boolean {
         val thisNextPos = headPos().nextPos(potentialDir).normalized(board!!.width, board!!.height)
         for (snake in board!!.liveSnakes) {

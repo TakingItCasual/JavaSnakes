@@ -45,3 +45,6 @@ fabric.properties
 
 .idea/
 *.iml
+
+# Temporary
+/src/com/JavaSnakes/io/

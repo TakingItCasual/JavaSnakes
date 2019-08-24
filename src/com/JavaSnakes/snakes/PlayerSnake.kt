@@ -1,21 +1,18 @@
 package com.JavaSnakes.snakes
 
-import java.awt.Color
-import java.util.HashMap
-
+import com.JavaSnakes.states.menu.PlayerSettings
 import com.JavaSnakes.util.Direction
 import com.JavaSnakes.util.GridPos
+
+import java.util.HashMap
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.system.exitProcess
 
 class PlayerSnake(
         private var directionBuffer: Direction,
         initPos: GridPos,
-        setColor: Color,
-        ctrlUp: Int,
-        ctrlDown: Int,
-        ctrlLeft: Int,
-        ctrlRight: Int
-) : SnakeBase(directionBuffer, initPos, setColor) {
+        playerData: PlayerSettings.PlayerData
+) : SnakeBase(directionBuffer, initPos, playerData.color) {
     companion object {
         private val NEXT_ID = AtomicInteger(1)
     }
@@ -26,12 +23,12 @@ class PlayerSnake(
     private val ctrlKeys: HashMap<Int, Direction> = HashMap()
 
     init {
-        ctrlKeys[ctrlUp] = Direction.Up
-        ctrlKeys[ctrlDown] = Direction.Down
-        ctrlKeys[ctrlLeft] = Direction.Left
-        ctrlKeys[ctrlRight] = Direction.Right
+        ctrlKeys[playerData.ctrls.up!!] = Direction.Up
+        ctrlKeys[playerData.ctrls.down!!] = Direction.Down
+        ctrlKeys[playerData.ctrls.left!!] = Direction.Left
+        ctrlKeys[playerData.ctrls.right!!] = Direction.Right
 
-        if (ctrlKeys.size != 4) System.exit(1) // TODO: Properly handle duplicate control keys
+        if (ctrlKeys.size != 4) exitProcess(1) // TODO: Properly handle duplicate control keys
     }
 
     override fun processDirection() {

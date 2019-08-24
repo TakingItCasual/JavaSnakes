@@ -3,6 +3,7 @@ package com.JavaSnakes.states.game
 import com.JavaSnakes.snakes.BotSnake
 import com.JavaSnakes.snakes.PlayerSnake
 import com.JavaSnakes.snakes.SnakeBase
+import com.JavaSnakes.states.menu.PlayerSettings
 import com.JavaSnakes.util.Direction
 import com.JavaSnakes.util.GridPos
 
@@ -40,11 +41,8 @@ class InitSnakes(private val mapWidth: Int, private val mapHeight: Int) {
         snakes = ArrayList()
     }
 
-    fun addPlayerSnake(snakeColor: Color, ctrlUp: Int, ctrlDown: Int, ctrlLeft: Int, ctrlRight: Int) {
-        snakes.add(PlayerSnake(
-            snakeInitDir, snakeInitPos, snakeColor,
-            ctrlUp, ctrlDown, ctrlLeft, ctrlRight
-        ))
+    fun addPlayerSnake(playerData: PlayerSettings.PlayerData) {
+        snakes.add(PlayerSnake(snakeInitDir, snakeInitPos, playerData))
     }
 
     fun addBotSnakes(snakeColor: Color, count: Int) {
