@@ -1,7 +1,9 @@
 package com.JavaSnakes
 
 import com.JavaSnakes.states.menu.MenuPanel
+import com.JavaSnakes.util.GameState
 
+import java.util.Stack
 import javax.swing.JFrame
 import javax.swing.JOptionPane
 import javax.swing.JPanel
@@ -21,14 +23,27 @@ class Main : JFrame() {
         }
     }
 
+    private val stateStack = Stack<GameState>()
+
     init {
         title = "Snake"
         defaultCloseOperation = EXIT_ON_CLOSE
 
-        changePanel(MenuPanel(this).mainPanel)
+        toNewPanel(MenuPanel(this))
     }
 
-    fun changePanel(newPanel: JPanel) {
+    fun toNewPanel(newState: GameState) {
+        stateStack.push(newState)
+        changePanel(newState.mainPanel)
+    }
+
+    fun toPrevPanel() {
+        stateStack.pop()
+        stateStack.peek().cleanUp()
+        changePanel(stateStack.peek().mainPanel)
+    }
+
+    private fun changePanel(newPanel: JPanel) {
         isVisible = false
 
         contentPane.removeAll()

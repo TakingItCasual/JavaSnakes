@@ -5,6 +5,8 @@ import com.JavaSnakes.states.game.GamePanel
 import com.JavaSnakes.states.game.InitSnakes
 import com.JavaSnakes.util.CustomJCheckBox
 import com.JavaSnakes.util.CustomJSpinner
+import com.JavaSnakes.util.GameState
+import com.JavaSnakes.util.GridPos
 import com.JavaSnakes.util.MenuCard
 
 import java.awt.CardLayout
@@ -13,16 +15,13 @@ import java.awt.Dimension
 import java.awt.Insets
 import javax.swing.JButton
 import javax.swing.JLabel
-import javax.swing.JPanel
 import javax.swing.JSeparator
 import javax.swing.SwingConstants
 import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.system.exitProcess
 
-class MenuPanel(private val owner: Main) {
-    val mainPanel = JPanel()
-
+class MenuPanel(owner: Main) : GameState(owner) {
     private val cardLayout: CardLayout
 
     private val newGameButton = JButton("New Game")
@@ -53,6 +52,10 @@ class MenuPanel(private val owner: Main) {
 
         cardLayout = mainPanel.layout as CardLayout
         mainPanel.preferredSize = Dimension(300, 300)
+    }
+
+    override fun cleanUp() {
+        toMainMenuCard()
     }
 
     private fun createMainMenuCard() {
@@ -169,6 +172,9 @@ class MenuPanel(private val owner: Main) {
     }
 
     private fun startGame() {
+        GridPos.boardW = mapW.value
+        GridPos.boardH = mapH.value
+
         val initSnakes = InitSnakes(mapW.value, mapH.value)
         for (i in 0 until playerCount.value) {
             initSnakes.addPlayerSnake(playerSettings.players[i])
@@ -179,6 +185,6 @@ class MenuPanel(private val owner: Main) {
             owner, frameDelay.value, 10,
             mapW.value, mapH.value, wallsEnabled.value, initSnakes.snakes
         )
-        owner.changePanel(gamePanel.mainPanel)
+        owner.toNewPanel(gamePanel)
     }
 }

@@ -9,7 +9,7 @@ import java.awt.Color
 import java.util.Collections
 import java.util.LinkedList
 
-abstract class SnakeBase internal constructor(
+abstract class SnakeBase protected constructor(
         protected var direction: Direction,
         var initPos: GridPos,
         var color: Color
@@ -36,8 +36,7 @@ abstract class SnakeBase internal constructor(
     }
 
     fun moveHead() {
-        val newHead = headPos().nextPos(direction).normalized(board!!.width, board!!.height)
-        coords.addFirst(newHead)
+        coords.addFirst(headPos().nextPos(direction))
     }
 
     fun removeTailEnd() {

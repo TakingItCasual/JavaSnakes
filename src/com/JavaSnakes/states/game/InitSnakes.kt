@@ -11,7 +11,7 @@ import java.awt.Color
 import java.util.ArrayList
 
 class InitSnakes(private val mapWidth: Int, private val mapHeight: Int) {
-    val snakes: MutableList<SnakeBase>
+    val snakes = arrayListOf<SnakeBase>()
 
     private val snakeInitDir: Direction
         get() = when {
@@ -36,10 +36,6 @@ class InitSnakes(private val mapWidth: Int, private val mapHeight: Int) {
 
             return GridPos(initPosX, initPosY)
         }
-
-    init {
-        snakes = ArrayList()
-    }
 
     fun addPlayerSnake(playerData: PlayerSettings.PlayerData) {
         snakes.add(PlayerSnake(snakeInitDir, snakeInitPos, playerData))

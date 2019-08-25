@@ -1,21 +1,25 @@
 package com.JavaSnakes.util
 
-class GridPos constructor(var x: Int = 0, var y: Int = 0) {
+class GridPos(var x: Int = 0, var y: Int = 0) {
     constructor(other: GridPos): this(other.x, other.y)
 
-    // TODO: Combined nextPos and normalized method
+    companion object {
+        var boardW: Int? = null
+        var boardH: Int? = null
+    }
+
     fun nextPos(dir: Direction): GridPos {
         return when (dir) {
-            Direction.Up -> GridPos(x, y - 1)
-            Direction.Down -> GridPos(x, y + 1)
-            Direction.Left -> GridPos(x - 1, y)
-            Direction.Right -> GridPos(x + 1, y)
+            Direction.Up -> normalized(x, y - 1)
+            Direction.Down -> normalized(x, y + 1)
+            Direction.Left -> normalized(x - 1, y)
+            Direction.Right -> normalized(x + 1, y)
         }
     }
 
-    fun normalized(boardWidth: Int, boardHeight: Int): GridPos {
-        val newX = Math.floorMod(x, boardWidth)
-        val newY = Math.floorMod(y, boardHeight)
+    private fun normalized(nextX: Int, nextY: Int): GridPos {
+        val newX = Math.floorMod(nextX, boardW!!)
+        val newY = Math.floorMod(nextY, boardH!!)
         return GridPos(newX, newY)
     }
 

@@ -4,7 +4,7 @@ import com.JavaSnakes.Board
 import com.JavaSnakes.Main
 import com.JavaSnakes.snakes.PlayerSnake
 import com.JavaSnakes.snakes.SnakeBase
-import com.JavaSnakes.states.menu.MenuPanel
+import com.JavaSnakes.util.GameState
 import com.JavaSnakes.util.asOrdinal
 import com.JavaSnakes.util.GridPos
 import com.JavaSnakes.util.MenuCard
@@ -25,16 +25,14 @@ import javax.swing.JPanel
 import javax.swing.JScrollPane
 
 class GamePanel(
-        private val owner: Main,
+        owner: Main,
         private val delay: Int,
         private val cellSize: Int,
         setMapW: Int,
         setMapH: Int,
         includeWalls: Boolean,
         setSnakes: List<SnakeBase>
-) : Runnable {
-    var mainPanel = JPanel()
-
+) : GameState(owner), Runnable {
     private val cardLayout: CardLayout
 
     private val mainGamePanel = MainGamePanel()
@@ -123,7 +121,7 @@ class GamePanel(
     }
 
     private fun toMainMenu() {
-        owner.changePanel(MenuPanel(owner).mainPanel)
+        owner.toPrevPanel()
     }
 
     private fun toGameCard() {

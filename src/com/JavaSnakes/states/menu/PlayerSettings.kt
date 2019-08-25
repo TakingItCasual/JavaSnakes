@@ -14,8 +14,8 @@ class PlayerSettings {
     val dirCtrlFields = Array(4) { JTextField("") }
 
     var players = mutableListOf(
-        PlayerData(Color.blue, KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT),
-        PlayerData(Color.blue, KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D)
+        PlayerData(Color.blue, Controls(KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT)),
+        PlayerData(Color.blue, Controls(KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D))
     )
     var playerTemp = PlayerData()
 
@@ -32,7 +32,7 @@ class PlayerSettings {
             dirCtrlField.font = font
         }
 
-        snakeNumChanged()
+        snakeNumChanged() // Fill out settings of first player to fields
     }
 
     private fun snakeNumChanged() {
@@ -43,39 +43,25 @@ class PlayerSettings {
                 dirCtrlField.text = "undefined"
             }
         } else {
-            playerTemp = players[snakeNum.value - 1].clone()
+            playerTemp = players[snakeNum.value - 1].copy()
             for ((i, dirCtrlField) in dirCtrlFields.withIndex()) {
                 dirCtrlField.text = KeyEvent.getKeyText(playerTemp.ctrls[i]!!)
             }
         }
     }
 
-    class PlayerData {
-        var color: Color
-        var ctrls: Controls
-
-        constructor(
-                setColor: Color = Color.black,
-                upCtrl: Int? = null,
-                downCtrl: Int? = null,
-                leftCtrl: Int? = null,
-                rightCtrl: Int? = null
-        ) {
-            color = setColor
-            ctrls = Controls(upCtrl, downCtrl, leftCtrl, rightCtrl)
-        }
-
-        private constructor(setColor: Color, setCtrls: Controls) {
-            color = setColor
-            ctrls = setCtrls
-        }
-
-        fun clone(): PlayerData {
-            return PlayerData(color, ctrls)
-        }
-    }
+    data class PlayerData(var color: Color = Color.black, var ctrls: Controls = Controls())
 
     class Controls : ArrayList<Int?> {
+        constructor(upCtrl: Int?, downCtrl: Int?, leftCtrl: Int?, rightCtrl: Int?) {
+            this.add(upCtrl)
+            this.add(downCtrl)
+            this.add(leftCtrl)
+            this.add(rightCtrl)
+        }
+
+        constructor(): this(null, null, null, null)
+
         var up: Int?
             get() = this[0]
             set(value) { this[0] = value }
@@ -92,16 +78,9 @@ class PlayerSettings {
         // It is expected that valid key codes are positive integers
         val isValid: Boolean
             get() = !this.contains(null) && this.none { it!! < 0 } && this.distinct().size == 4
-
-        constructor(upCtrl: Int? = null, downCtrl: Int? = null, leftCtrl: Int? = null, rightCtrl: Int? = null) {
-            this.add(upCtrl)
-            this.add(downCtrl)
-            this.add(leftCtrl)
-            this.add(rightCtrl)
-        }
     }
 
-    private inner class CtrlInput constructor(internal var dirIndex: Int) : KeyAdapter() {
+    private inner class CtrlInput(private val dirIndex: Int) : KeyAdapter() {
         override fun keyPressed(e: KeyEvent) {
             val key = e.keyCode
             if (key == KeyEvent.VK_ESCAPE || key == KeyEvent.VK_SPACE) return
@@ -112,7 +91,7 @@ class PlayerSettings {
             if (snakeNum.value > players.size) {
                 playerTemp.ctrls[dirIndex] = key
                 if (playerTemp.ctrls.isValid) {
-                    players.add(playerTemp.clone())
+                    players.add(playerTemp.copy())
                 }
             } else {
                 players[snakeNum.value - 1].ctrls[dirIndex] = key
@@ -121,7 +100,7 @@ class PlayerSettings {
     }
 
     // Class for giving visual indication of when JTextField is focused on (CtrlInput class helps with this)
-    private inner class CtrlInputFocus constructor(internal var dirIndex: Int) : FocusListener {
+    private inner class CtrlInputFocus(private val dirIndex: Int) : FocusListener {
         override fun focusGained(e: FocusEvent) {
             dirCtrlFields[dirIndex].text = " " + dirCtrlFields[dirIndex].text.trim()
         }
