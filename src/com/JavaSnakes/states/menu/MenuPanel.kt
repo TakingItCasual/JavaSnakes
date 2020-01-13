@@ -38,6 +38,7 @@ class MenuPanel(owner: Main) : GameState(owner) {
     private val mapW = CustomJSpinner(30, 20, 100)
     private val mapH = CustomJSpinner(20, 20, 100)
     private val frameDelay = CustomJSpinner(100, 25, 1000, 25)
+    private val foodCount = CustomJSpinner(2, 1, 10000)
     private val playerSettings = PlayerSettings()
 
     private val maxSnakeCount: Int
@@ -98,6 +99,7 @@ class MenuPanel(owner: Main) : GameState(owner) {
         val mapHeightLabel = JLabel("Map height:")
         val frameDelayLabel = JLabel("Frame delay:")
         frameDelay.spinner.addChangeListener { frameDelayChanged() }
+        val foodCountLabel = JLabel("Food count:")
         val separator = JSeparator(SwingConstants.HORIZONTAL)
         val snakeNumLabel = JLabel("Player snake:")
         val upCtrlLabel = JLabel("Up key:")
@@ -113,17 +115,19 @@ class MenuPanel(owner: Main) : GameState(owner) {
         gridBag.addInGrid(mapH.spinner, 2, 1)
         gridBag.addInGrid(frameDelayLabel, 3, 0)
         gridBag.addInGrid(frameDelay.spinner, 3, 1)
-        gridBag.addInGrid(separator, 4, 0, 2, Insets(5, 0, 5, 0))
-        gridBag.addInGrid(snakeNumLabel, 5, 0)
-        gridBag.addInGrid(playerSettings.snakeNum.spinner, 5, 1)
-        gridBag.addInGrid(upCtrlLabel, 6, 0)
-        gridBag.addInGrid(playerSettings.dirCtrlFields[0], 6, 1)
-        gridBag.addInGrid(downCtrlLabel, 7, 0)
-        gridBag.addInGrid(playerSettings.dirCtrlFields[1], 7, 1)
-        gridBag.addInGrid(leftCtrlLabel, 8, 0)
-        gridBag.addInGrid(playerSettings.dirCtrlFields[2], 8, 1)
-        gridBag.addInGrid(rightCtrlLabel, 9, 0)
-        gridBag.addInGrid(playerSettings.dirCtrlFields[3], 9, 1)
+        gridBag.addInGrid(foodCountLabel, 4, 0)
+        gridBag.addInGrid(foodCount.spinner, 4, 1)
+        gridBag.addInGrid(separator, 5, 0, 2, Insets(5, 0, 5, 0))
+        gridBag.addInGrid(snakeNumLabel, 6, 0)
+        gridBag.addInGrid(playerSettings.snakeNum.spinner, 6, 1)
+        gridBag.addInGrid(upCtrlLabel, 7, 0)
+        gridBag.addInGrid(playerSettings.dirCtrlFields[0], 7, 1)
+        gridBag.addInGrid(downCtrlLabel, 8, 0)
+        gridBag.addInGrid(playerSettings.dirCtrlFields[1], 8, 1)
+        gridBag.addInGrid(leftCtrlLabel, 9, 0)
+        gridBag.addInGrid(playerSettings.dirCtrlFields[2], 9, 1)
+        gridBag.addInGrid(rightCtrlLabel, 10, 0)
+        gridBag.addInGrid(playerSettings.dirCtrlFields[3], 10, 1)
 
         mainPanel.add(gridBag, "settings card")
     }
@@ -183,7 +187,7 @@ class MenuPanel(owner: Main) : GameState(owner) {
 
         val gamePanel = GamePanel(
             owner, frameDelay.value, 10,
-            mapW.value, mapH.value, wallsEnabled.value, initSnakes.snakes
+            mapW.value, mapH.value, wallsEnabled.value, foodCount.value, initSnakes.snakes
         )
         owner.toNewPanel(gamePanel)
     }

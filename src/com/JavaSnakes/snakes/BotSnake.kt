@@ -5,6 +5,7 @@ import java.awt.Color
 import com.JavaSnakes.util.Direction
 import com.JavaSnakes.util.GridPos
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.math.abs
 
 class BotSnake(initDir: Direction, initPos: GridPos, setColor: Color) : SnakeBase(initDir, initPos, setColor) {
     companion object {
@@ -17,16 +18,8 @@ class BotSnake(initDir: Direction, initPos: GridPos, setColor: Color) : SnakeBas
     override fun processDirection() {
         val dirByPriority = Array(4) { Direction.Up }
 
-        var diffX = board!!.foodPos.x - headPos().x
-        var diffY = board!!.foodPos.y - headPos().y
-        if (!board!!.isWalled) {
-            val altDiffX = if (diffX >= 0) diffX - board!!.width else diffX + board!!.width
-            val altDiffY = if (diffY >= 0) diffY - board!!.height else diffY + board!!.height
-            if (Math.abs(altDiffX) < Math.abs(diffX)) diffX = altDiffX
-            if (Math.abs(altDiffY) < Math.abs(diffY)) diffY = altDiffY
-        }
-
-        if (Math.abs(diffX) < Math.abs(diffY)) {
+        val (diffX, diffY) = closestFoodDiff()
+        if (abs(diffX) < abs(diffY)) {
             if (diffX != 0) {
                 if (diffX > 0) {
                     dirByPriority[0] = Direction.Right
@@ -93,6 +86,31 @@ class BotSnake(initDir: Direction, initPos: GridPos, setColor: Color) : SnakeBas
             direction = potentialDir
             break
         }
+    }
+
+    private fun closestFoodDiff(): Pair<Int, Int> {
+        var returnX = board!!.width * 2
+        var returnY = board!!.height * 2
+        for (foodPos in board!!.foodsPos) {
+            val (diffX, diffY) = foodDiff(foodPos)
+            if (abs(diffX) + abs(diffY) < abs(returnX) + abs(returnY)) {
+                returnX = diffX
+                returnY = diffY
+            }
+        }
+        return Pair(returnX, returnY)
+    }
+
+    private fun foodDiff(foodPos: GridPos): Pair<Int, Int> {
+        var diffX = foodPos.x - headPos().x
+        var diffY = foodPos.y - headPos().y
+        if (!board!!.isWalled) {
+            val altDiffX = if (diffX >= 0) diffX - board!!.width else diffX + board!!.width
+            val altDiffY = if (diffY >= 0) diffY - board!!.height else diffY + board!!.height
+            if (abs(altDiffX) < abs(diffX)) diffX = altDiffX
+            if (abs(altDiffY) < abs(diffY)) diffY = altDiffY
+        }
+        return Pair(diffX, diffY)
     }
 
     private fun nextTileObstructed(potentialDir: Direction): Boolean {

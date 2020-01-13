@@ -7,41 +7,30 @@ import com.JavaSnakes.util.Status
 import java.util.ArrayList
 import java.util.concurrent.ThreadLocalRandom
 
-class Board(val width: Int, val height: Int, val isWalled: Boolean, setSnakes: List<SnakeBase>) {
-    var walls = Array(width) { BooleanArray(height) }
-
+class Board(val width: Int, val height: Int, val isWalled: Boolean, val foodCount: Int, setSnakes: List<SnakeBase>) {
     var snakes: MutableList<SnakeBase> = ArrayList()
     var liveSnakes: MutableList<SnakeBase> = ArrayList()
 
-    var foodPos = GridPos()
+    var foodsPos: MutableList<GridPos> = ArrayList()
 
     init {
         SnakeBase.board = this
 
-        if (isWalled) {
-            for (x in 0 until width) {
-                for (y in 0 until height) {
-                    walls[x][y] = x == 0 || x == width - 1 || y == 0 || y == height - 1
-                }
-            }
-        }
-
         snakes.addAll(setSnakes)
         liveSnakes.addAll(setSnakes)
 
-        createFood()
+        val freeArea = freeMapArea()
+        repeat(foodCount) {
+            addFood(freeArea)
+        }
     }
 
     fun checkCollisions() {
         for (snake in liveSnakes) {
-            if (wallCollided(snake) || snake.selfCollided() || snakeCollided(snake)) {
+            if (tileHasWall(snake.headPos()) || snake.selfCollided() || snakeCollided(snake)) {
                 snake.status = Status.Collided
             }
         }
-    }
-
-    private fun wallCollided(snake: SnakeBase): Boolean {
-        return walls[snake.headPos().x][snake.headPos().y]
     }
 
     private fun snakeCollided(snake: SnakeBase): Boolean {
@@ -65,22 +54,41 @@ class Board(val width: Int, val height: Int, val isWalled: Boolean, setSnakes: L
         }
     }
 
-    fun checkFood() {
+    // TODO: Test with almost-full-map saved game
+    fun checkFood(): Boolean {
         for (snake in liveSnakes) {
-            if (snake.headPos() == foodPos) {
+            if (snake.headPos() in foodsPos) {
+                foodsPos.remove(snake.headPos())
                 snake.feed()
-                createFood()
+
+                val freeArea = freeMapArea()
+                if (freeArea <= 0) return false // Map full, game over
+                addFood(freeArea)
             }
         }
+        return true
     }
 
-    // TODO: Implement a win mechanism instead of ending in an infinite loop
-    fun createFood() {
+    private fun addFood(freeArea: Int) {
+        if (freeArea - foodsPos.size <= 0) return
+
+        val newPos = GridPos()
         while (true) {
-            foodPos.x = ThreadLocalRandom.current().nextInt(0, width)
-            foodPos.y = ThreadLocalRandom.current().nextInt(0, height)
-            if (!tileObstructed(foodPos)) break
+            newPos.x = ThreadLocalRandom.current().nextInt(0, width)
+            newPos.y = ThreadLocalRandom.current().nextInt(0, height)
+            if (!tileObstructed(newPos) && !foodsPos.contains(newPos)) break
         }
+        foodsPos.add(newPos)
+    }
+
+    // Returns number of tiles not taken by snakes or walls
+    private fun freeMapArea(): Int {
+        var snakeLengthsTotal = 0
+        for (snake in liveSnakes) {
+            snakeLengthsTotal += snake.coords.size + 1 // Include space behind snake
+        }
+        val totalArea = if (!isWalled) (width * height) else ((width-2) * (height-2))
+        return totalArea - snakeLengthsTotal
     }
 
     fun tileObstructed(coord: GridPos): Boolean {
@@ -88,7 +96,7 @@ class Board(val width: Int, val height: Int, val isWalled: Boolean, setSnakes: L
     }
 
     private fun tileHasWall(coord: GridPos): Boolean {
-        return walls[coord.x][coord.y]
+        return isWalled && (coord.x == 0 || coord.x == width-1 || coord.y == 0 || coord.y == height-1)
     }
 
     private fun tileHasSnake(coord: GridPos): Boolean {

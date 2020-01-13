@@ -1,5 +1,7 @@
 package com.JavaSnakes.util
 
+import java.lang.RuntimeException
+
 class GridPos(var x: Int = 0, var y: Int = 0) {
     constructor(other: GridPos): this(other.x, other.y)
 
@@ -14,6 +16,19 @@ class GridPos(var x: Int = 0, var y: Int = 0) {
             Direction.Down -> normalized(x, y + 1)
             Direction.Left -> normalized(x - 1, y)
             Direction.Right -> normalized(x + 1, y)
+        }
+    }
+
+    // Used by rendering to decide how to draw snake sections
+    fun otherDir(other: GridPos): Direction {
+        val xOffset = this.x - other.x
+        val yOffset = this.y - other.y
+        return when {
+            xOffset == 1 || xOffset < -1 -> Direction.Left
+            xOffset == -1 || xOffset > 1 -> Direction.Right
+            yOffset == 1 || yOffset < -1 -> Direction.Up
+            yOffset == -1 || yOffset > 1 -> Direction.Down
+            else -> throw RuntimeException()
         }
     }
 

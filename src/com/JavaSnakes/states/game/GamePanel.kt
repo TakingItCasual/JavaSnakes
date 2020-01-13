@@ -4,6 +4,7 @@ import com.JavaSnakes.Board
 import com.JavaSnakes.Main
 import com.JavaSnakes.snakes.PlayerSnake
 import com.JavaSnakes.snakes.SnakeBase
+import com.JavaSnakes.util.Direction
 import com.JavaSnakes.util.GameState
 import com.JavaSnakes.util.asOrdinal
 import com.JavaSnakes.util.GridPos
@@ -31,6 +32,7 @@ class GamePanel(
         setMapW: Int,
         setMapH: Int,
         includeWalls: Boolean,
+        setFoodCount: Int,
         setSnakes: List<SnakeBase>
 ) : GameState(owner), Runnable {
     private val cardLayout: CardLayout
@@ -63,7 +65,7 @@ class GamePanel(
         miniOffset = 1
         miniCell = cellSize - 2 * miniOffset
 
-        board = Board(setMapW, setMapH, includeWalls, setSnakes)
+        board = Board(setMapW, setMapH, includeWalls, setFoodCount, setSnakes)
         mainPanel.preferredSize = Dimension(board.width * cellSize, board.height * cellSize)
 
         animator = Thread(this)
@@ -169,7 +171,7 @@ class GamePanel(
         board.killCollidedSnakes()
         if (board.liveSnakes.size == 0) inGame = false
 
-        board.checkFood()
+        if (!board.checkFood()) inGame = false
         for (snake in board.liveSnakes)
             snake.removeTailEnd()
     }
@@ -197,7 +199,7 @@ class GamePanel(
             if (inGame) {
                 drawFood(g)
                 drawSnakes(g)
-                drawWalls(g)
+                if (board.isWalled) drawWalls(g)
             }
 
             Toolkit.getDefaultToolkit().sync()
@@ -206,7 +208,9 @@ class GamePanel(
 
         private fun drawFood(g: Graphics) {
             g.color = Color.red
-            drawMiniSquare(g, board.foodPos)
+            for (foodPos in board.foodsPos) {
+                drawMiniSquare(g, foodPos)
+            }
         }
 
         private fun drawSnakes(g: Graphics) {
@@ -214,34 +218,56 @@ class GamePanel(
                 g.color = snake.color
 
                 drawFullSquare(g, snake.headPos())
+                drawMiniSquareOffset(g, snake.coords[1], snake.coords[1].otherDir(snake.headPos()))
+
+                // Iterator used instead of random access due to LinkedList type
                 val iter = snake.coords.listIterator(1)
+                var prevCoord = iter.next()
                 while (iter.hasNext()) {
-                    drawMiniSquare(g, iter.next())
+                    val nowCoord = iter.next()
+                    drawMiniSquareOffset(g, prevCoord, prevCoord.otherDir(nowCoord))
+                    drawMiniSquareOffset(g, nowCoord, nowCoord.otherDir(prevCoord))
+                    prevCoord = nowCoord
                 }
             }
         }
 
         private fun drawWalls(g: Graphics) {
             g.color = Color.black
-            for (x in 0 until board.width) {
-                for (y in 0 until board.height) {
-                    if (board.walls[x][y]) {
-                        drawFullSquare(g, x, y)
-                    }
-                }
-            }
+            g.fillRect(0, 0, cellSize * board.width, cellSize)
+            g.fillRect(0, 0, cellSize, cellSize * board.height)
+            g.fillRect(0, cellSize * (board.height - 1), cellSize * board.width, cellSize)
+            g.fillRect(cellSize * (board.width - 1), 0, cellSize, cellSize * board.height)
+
+            g.color = Color.white
+            g.fillRect(cellSize, cellSize - 1, cellSize * (board.width - 2), 1)
+            g.fillRect(cellSize - 1, cellSize, 1, cellSize * (board.height - 2))
+            g.fillRect(cellSize, cellSize * (board.height - 1), cellSize * (board.width - 2), 1)
+            g.fillRect(cellSize * (board.width - 1), cellSize, 1, cellSize * (board.height - 2))
         }
 
         private fun drawFullSquare(g: Graphics, coord: GridPos) {
-            drawFullSquare(g, coord.x, coord.y)
-        }
-
-        private fun drawFullSquare(g: Graphics, x: Int, y: Int) {
-            g.fillRect(x * cellSize, y * cellSize, cellSize, cellSize)
+            g.fillRect(coord.x * cellSize, coord.y * cellSize, cellSize, cellSize)
         }
 
         private fun drawMiniSquare(g: Graphics, coord: GridPos) {
             g.fillRect(coord.x * cellSize + miniOffset, coord.y * cellSize + miniOffset, miniCell, miniCell)
+        }
+
+        private fun drawMiniSquareOffset(g: Graphics, coord: GridPos, otherDir: Direction) {
+            var xOffset = 0
+            var yOffset = 0
+            when (otherDir) {
+                Direction.Up -> yOffset = -1
+                Direction.Down -> yOffset = 1
+                Direction.Left -> xOffset = -1
+                Direction.Right -> xOffset = 1
+            }
+            g.fillRect(
+                coord.x * cellSize + miniOffset + xOffset,
+                coord.y * cellSize + miniOffset + yOffset,
+                miniCell, miniCell
+            )
         }
 
         private inner class Input : KeyAdapter() {
