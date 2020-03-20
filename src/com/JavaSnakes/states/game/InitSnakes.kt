@@ -8,7 +8,7 @@ import com.JavaSnakes.util.Direction
 import com.JavaSnakes.util.GridPos
 
 import java.awt.Color
-import java.util.ArrayList
+import java.util.Random
 
 class InitSnakes(private val mapWidth: Int, private val mapHeight: Int) {
     val snakes = arrayListOf<SnakeBase>()
@@ -41,9 +41,19 @@ class InitSnakes(private val mapWidth: Int, private val mapHeight: Int) {
         snakes.add(PlayerSnake(snakeInitDir, snakeInitPos, playerData))
     }
 
-    fun addBotSnakes(snakeColor: Color, count: Int) {
+    fun addBotSnakes(count: Int) {
+        val rand = Random()
+        var r: Int
+        var g: Int
+        var b: Int
         for (i in 0 until count) {
-            snakes.add(BotSnake(snakeInitDir, snakeInitPos, snakeColor))
+            while (true) {
+                r = rand.nextInt(256)
+                g = rand.nextInt(256)
+                b = rand.nextInt(256)
+                if (listOf(r, g, b).min()!! + 100 < listOf(r, g, b).max()!!) break
+            }
+            snakes.add(BotSnake(snakeInitDir, snakeInitPos, Color(r, g, b)))
         }
     }
 }

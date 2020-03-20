@@ -79,10 +79,10 @@ class BotSnake(initDir: Direction, initPos: GridPos, setColor: Color) : SnakeBas
             }
         }
 
-        val potentialDirs = dirByPriority.filterNot { it === direction.opposite()}
+        val potentialDirs = dirByPriority.filterNot { it === direction.opposite()} // Can't move backwards
         for (potentialDir in potentialDirs) {
-            if (nextTileObstructed(potentialDir)) continue
-            if (nextTileClaimed(potentialDir)) continue
+            if (nextTileObstructed(potentialDir)) continue // Obstructed by wall or snake body
+            if (nextTileClaimed(potentialDir)) continue // Higher priority snake moving to tile
             direction = potentialDir
             break
         }

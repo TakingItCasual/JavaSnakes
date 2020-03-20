@@ -10,12 +10,12 @@ import com.JavaSnakes.util.GridPos
 import com.JavaSnakes.util.MenuCard
 
 import java.awt.CardLayout
-import java.awt.Color
 import java.awt.Dimension
 import java.awt.Insets
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JSeparator
+import javax.swing.SpinnerNumberModel
 import javax.swing.SwingConstants
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -23,6 +23,11 @@ import kotlin.system.exitProcess
 
 class MenuPanel(owner: Main) : GameState(owner) {
     private val cardLayout: CardLayout
+    companion object {
+        private const val MAIN_MENU_CARD = "main menu card"
+        private const val NEW_GAME_CARD = "new game card"
+        private const val SETTINGS_CARD = "settings card"
+    }
 
     private val newGameButton = JButton("New Game")
     private val settingsButton = JButton("Settings")
@@ -69,7 +74,7 @@ class MenuPanel(owner: Main) : GameState(owner) {
         gridBag.addInGrid(settingsButton, 1, 0)
         gridBag.addInGrid(quitButton, 2, 0)
 
-        mainPanel.add(gridBag, "main menu card")
+        mainPanel.add(gridBag, MAIN_MENU_CARD)
     }
 
     private fun createNewGameCard() {
@@ -90,7 +95,7 @@ class MenuPanel(owner: Main) : GameState(owner) {
         gridBag.addInGrid(wallsEnabled.checkBox, 3, 0, 2)
         gridBag.addInGrid(toMainButton1, 4, 0, 2)
 
-        mainPanel.add(gridBag, "new game card")
+        mainPanel.add(gridBag, NEW_GAME_CARD)
     }
 
     private fun createSettingsCard() {
@@ -129,11 +134,11 @@ class MenuPanel(owner: Main) : GameState(owner) {
         gridBag.addInGrid(rightCtrlLabel, 10, 0)
         gridBag.addInGrid(playerSettings.dirCtrlFields[3], 10, 1)
 
-        mainPanel.add(gridBag, "settings card")
+        mainPanel.add(gridBag, SETTINGS_CARD)
     }
 
     private fun toMainMenuCard() {
-        cardLayout.show(mainPanel, "main menu card")
+        cardLayout.show(mainPanel, MAIN_MENU_CARD)
         newGameButton.requestFocus()
     }
 
@@ -142,12 +147,12 @@ class MenuPanel(owner: Main) : GameState(owner) {
         playerCount.setModel(1, 0, maxSnakeCount)
         botCount.setModel(0, 0, maxSnakeCount)
 
-        cardLayout.show(mainPanel, "new game card")
+        cardLayout.show(mainPanel, NEW_GAME_CARD)
         startGameButton.requestFocus()
     }
 
     private fun toSettingsCard() {
-        cardLayout.show(mainPanel, "settings card")
+        cardLayout.show(mainPanel, SETTINGS_CARD)
         toMainButton2.requestFocus()
     }
 
@@ -170,8 +175,10 @@ class MenuPanel(owner: Main) : GameState(owner) {
     }
 
     private fun frameDelayChanged() {
-        if (frameDelay.value % 25 != 0) {
-            frameDelay.value = (frameDelay.value.toFloat() / 25).roundToInt() * 25
+        val stepSize = (frameDelay.spinner.model as SpinnerNumberModel).stepSize as Int
+        if (frameDelay.value % stepSize != 0) {
+            // Value rounded to nearest step size multiple
+            frameDelay.value = (frameDelay.value.toFloat() / stepSize).roundToInt() * stepSize
         }
     }
 
@@ -183,7 +190,7 @@ class MenuPanel(owner: Main) : GameState(owner) {
         for (i in 0 until playerCount.value) {
             initSnakes.addPlayerSnake(playerSettings.players[i])
         }
-        initSnakes.addBotSnakes(Color.black, botCount.value)
+        initSnakes.addBotSnakes(botCount.value)
 
         val gamePanel = GamePanel(
             owner, frameDelay.value, 10,

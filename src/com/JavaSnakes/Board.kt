@@ -7,7 +7,13 @@ import com.JavaSnakes.util.Status
 import java.util.ArrayList
 import java.util.concurrent.ThreadLocalRandom
 
-class Board(val width: Int, val height: Int, val isWalled: Boolean, val foodCount: Int, setSnakes: List<SnakeBase>) {
+class Board(
+        val width: Int,
+        val height: Int,
+        val isWalled: Boolean,
+        foodCount: Int,
+        setSnakes: List<SnakeBase>
+) {
     var snakes: MutableList<SnakeBase> = ArrayList()
     var liveSnakes: MutableList<SnakeBase> = ArrayList()
 

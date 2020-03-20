@@ -15,7 +15,6 @@ import java.awt.Color
 import java.awt.Dimension
 import java.awt.Font
 import java.awt.Graphics
-import java.awt.Insets
 import java.awt.Toolkit
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
@@ -24,6 +23,10 @@ import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JScrollPane
+import javax.swing.JTable
+import javax.swing.table.DefaultTableColumnModel
+import javax.swing.table.DefaultTableModel
+import kotlin.math.max
 
 class GamePanel(
         owner: Main,
@@ -36,14 +39,19 @@ class GamePanel(
         setSnakes: List<SnakeBase>
 ) : GameState(owner), Runnable {
     private val cardLayout: CardLayout
+    companion object {
+        private const val GAME_CARD = "game card"
+        private const val ESCAPE_CARD = "escape card"
+        private const val END_CARD = "end card"
+    }
 
     private val mainGamePanel = MainGamePanel()
 
     private val continueButton = JButton("Continue")
-    private val quitToMenuButton = JButton("Quit to main menu")
+    private val quitToMenuButton = JButton("Quit")
 
     private val endCard = MenuCard()
-    private val backToMainButton = JButton("Back to main menu")
+    private val backToMainButton = JButton("Continue")
 
     private val miniCell: Int
     private val miniOffset: Int
@@ -57,7 +65,7 @@ class GamePanel(
     init {
         mainPanel.layout = CardLayout()
 
-        mainPanel.add(mainGamePanel, "game card")
+        mainPanel.add(mainGamePanel, GAME_CARD)
         createEscapeCard()
         createEndCard()
 
@@ -74,13 +82,13 @@ class GamePanel(
 
     private fun createEscapeCard() {
         continueButton.addActionListener { toGameCard() }
-        quitToMenuButton.addActionListener { toMainMenu() }
+        quitToMenuButton.addActionListener { toEndCard() }
 
         val gridBag = MenuCard()
         gridBag.addInGrid(continueButton, 0, 0)
         gridBag.addInGrid(quitToMenuButton, 1, 0)
 
-        mainPanel.add(gridBag, "escape card")
+        mainPanel.add(gridBag, ESCAPE_CARD)
     }
 
     private fun createEndCard() {
@@ -88,7 +96,7 @@ class GamePanel(
 
         endCard.addInGrid(backToMainButton, 0, 0)
 
-        mainPanel.add(endCard, "end card")
+        mainPanel.add(endCard, END_CARD)
     }
 
     private fun addScoresToEndCard() {
@@ -96,30 +104,75 @@ class GamePanel(
             compareBy<SnakeBase> { -it.score }.thenByDescending { it.groupName }.thenBy { it.idInGroup })
         val scoreSet = scoreSortedSnakes.map { it.score }.toSet()
 
-        val labelList = MenuCard()
-        val font = Font(JLabel().font.family, Font.BOLD, 14)
-        for ((i, snake) in scoreSortedSnakes.withIndex()) {
-            val placingLabel = JLabel((scoreSet.indexOf(snake.score) + 1).asOrdinal())
-            placingLabel.font = font
-            labelList.addInGrid(placingLabel, i, 0, padding = Insets(0, 10, 0, 0))
-
-            val nameLabel = JLabel(snake.groupName + " " + snake.idInGroup)
-            nameLabel.font = font
-            nameLabel.foreground = snake.color
-            labelList.addInGrid(nameLabel, i, 1, padding = Insets(0, 10, 0, 10))
-
-            val scoreLabel = JLabel(snake.score.toString())
-            scoreLabel.font = font
-            scoreLabel.foreground = snake.color
-            labelList.addInGrid(scoreLabel, i, 2, padding = Insets(0, 0, 0, 10))
+        val columnNames = arrayOf("Place", "Snake", "Score")
+        var data = mutableListOf<Array<String>>()
+        for (snake in scoreSortedSnakes) {
+            data.add(arrayOf(
+                (scoreSet.indexOf(snake.score) + 1).asOrdinal(),
+                snake.groupName + " " + snake.idInGroup,
+                snake.score.toString()
+            ))
         }
 
-        val scrollPane = JScrollPane(labelList)
+        val scoreTable = JTable(data.toTypedArray(), columnNames)
+        scoreTable.setShowGrid(false)
+        scoreTable.intercellSpacing = Dimension(0, 0)
+        scoreTable.font = Font(JLabel().font.family, Font.BOLD, 14)
+        scoreTable.model = object : DefaultTableModel(data.toTypedArray(), columnNames) {
+            // Disable table editing
+            override fun isCellEditable(row: Int, column: Int): Boolean {
+                return false
+            }
+        }
+        fitColumnWidthToContent(scoreTable)
+        /*val tableSorter: TableRowSorter<TableModel> = TableRowSorter(scoreTable.model)
+        scoreTable.rowSorter = tableSorter
+        val sortKeys: MutableList<RowSorter.SortKey> = ArrayList()
+        sortKeys.add(RowSorter.SortKey(0, SortOrder.ASCENDING))
+        tableSorter.sortKeys = sortKeys*/
+        // Disable (most?) table interactions
+        scoreTable.isFocusable = false
+        scoreTable.tableHeader.reorderingAllowed = false
+        scoreTable.tableHeader.resizingAllowed = false
+        scoreTable.rowSelectionAllowed = false
+
+        //scoreTable.background = Color.darkGray
+
+        val scrollPane = JScrollPane(scoreTable)
         scrollPane.border = BorderFactory.createEmptyBorder()
-        scrollPane.minimumSize = Dimension(-1, mainGamePanel.height / 2)
-        // TODO: Figure out how to set scrollPane's background color
-        // TODO: Figure out how to properly disable the horizontal scrollbar
+        scrollPane.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
+        scrollPane.preferredSize = Dimension(scoreTable.preferredSize.width, mainGamePanel.height / 2)
         endCard.addInGrid(scrollPane, 1, 0)
+    }
+
+    private fun fitColumnWidthToContent(table: JTable) {
+        table.autoResizeMode = JTable.AUTO_RESIZE_OFF
+        val colModel = table.columnModel as DefaultTableColumnModel
+        for (v in 0 until table.columnCount) {
+            val col = colModel.getColumn(v)
+            var width: Int
+
+            var renderer = col.headerRenderer
+            if (renderer == null) {
+                renderer = table.tableHeader.defaultRenderer
+            }
+            var comp = renderer.getTableCellRendererComponent(
+                    table, col.headerValue, false, false, 0, 0)
+            width = comp.preferredSize.width
+
+            for (r in 0 until table.rowCount) {
+                renderer = table.getCellRenderer(r, v)
+                comp = renderer.getTableCellRendererComponent(
+                        table, table.getValueAt(r, v), false, false, r, v)
+                width = max(width, comp.preferredSize.width)
+            }
+            col.preferredWidth = width + 10
+            if (v == table.columnCount - 1) {
+                col.preferredWidth += JScrollPane().verticalScrollBar.preferredSize.width
+            }
+            col.minWidth = col.preferredWidth
+            col.maxWidth = col.preferredWidth
+        }
     }
 
     private fun toMainMenu() {
@@ -128,19 +181,19 @@ class GamePanel(
 
     private fun toGameCard() {
         isPaused = false
-        cardLayout.show(mainPanel, "game card")
+        cardLayout.show(mainPanel, GAME_CARD)
         mainGamePanel.requestFocus()
     }
 
     private fun toEscapeCard() {
         isPaused = true
-        cardLayout.show(mainPanel, "escape card")
+        cardLayout.show(mainPanel, ESCAPE_CARD)
         continueButton.requestFocus()
     }
 
     private fun toEndCard() {
         addScoresToEndCard()
-        cardLayout.show(mainPanel, "end card")
+        cardLayout.show(mainPanel, END_CARD)
         backToMainButton.requestFocus()
     }
 
@@ -218,15 +271,15 @@ class GamePanel(
                 g.color = snake.color
 
                 drawFullSquare(g, snake.headPos())
-                drawMiniSquareOffset(g, snake.coords[1], snake.coords[1].otherDir(snake.headPos()))
+                drawOffsetMiniSquare(g, snake.coords[1], snake.coords[1].otherDir(snake.headPos()))
 
                 // Iterator used instead of random access due to LinkedList type
                 val iter = snake.coords.listIterator(1)
                 var prevCoord = iter.next()
                 while (iter.hasNext()) {
                     val nowCoord = iter.next()
-                    drawMiniSquareOffset(g, prevCoord, prevCoord.otherDir(nowCoord))
-                    drawMiniSquareOffset(g, nowCoord, nowCoord.otherDir(prevCoord))
+                    drawOffsetMiniSquare(g, prevCoord, prevCoord.otherDir(nowCoord))
+                    drawOffsetMiniSquare(g, nowCoord, nowCoord.otherDir(prevCoord))
                     prevCoord = nowCoord
                 }
             }
@@ -254,7 +307,7 @@ class GamePanel(
             g.fillRect(coord.x * cellSize + miniOffset, coord.y * cellSize + miniOffset, miniCell, miniCell)
         }
 
-        private fun drawMiniSquareOffset(g: Graphics, coord: GridPos, otherDir: Direction) {
+        private fun drawOffsetMiniSquare(g: Graphics, coord: GridPos, otherDir: Direction) {
             var xOffset = 0
             var yOffset = 0
             when (otherDir) {
