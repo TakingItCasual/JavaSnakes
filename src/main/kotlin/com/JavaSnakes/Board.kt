@@ -1,11 +1,12 @@
-package com.JavaSnakes
+package com.javasnakes
 
-import com.JavaSnakes.snakes.SnakeBase
-import com.JavaSnakes.util.GridPos
-import com.JavaSnakes.util.Status
+import com.javasnakes.snakes.SnakeBase
+import com.javasnakes.util.GridPos
+import com.javasnakes.util.Status
 
 import java.util.ArrayList
 import java.util.concurrent.ThreadLocalRandom
+import kotlinx.serialization.json.*
 
 class Board(
         val width: Int,
@@ -29,6 +30,9 @@ class Board(
         repeat(foodCount) {
             addFood(freeArea)
         }
+
+        //val json = Json(JsonConfiguration.Stable)
+        //println(json.stringify(GridPos.serializer(), GridPos(3, 3)))
     }
 
     fun checkCollisions() {

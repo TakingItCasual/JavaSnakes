@@ -1,4 +1,4 @@
-package com.JavaSnakes.util
+package com.javasnakes.util
 
 import javax.swing.JCheckBox
 

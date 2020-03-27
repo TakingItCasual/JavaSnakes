@@ -1,4 +1,4 @@
-package com.JavaSnakes.util
+package com.javasnakes.util
 
 import java.awt.Component
 import java.awt.GridBagConstraints

@@ -1,6 +1,6 @@
-package com.JavaSnakes.states.menu
+package com.javasnakes.states.menu
 
-import com.JavaSnakes.util.CustomJSpinner
+import com.javasnakes.util.CustomJSpinner
 import java.awt.Color
 import java.awt.Font
 import java.awt.event.FocusEvent

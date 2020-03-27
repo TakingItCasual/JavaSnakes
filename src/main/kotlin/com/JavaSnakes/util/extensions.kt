@@ -1,4 +1,4 @@
-package com.JavaSnakes.util
+package com.javasnakes.util
 
 fun Int.asOrdinal(): String {
     return this.toString() + when (this % 100) {

@@ -1,6 +1,6 @@
-package com.JavaSnakes.util
+package com.javasnakes.util
 
-import com.JavaSnakes.Main
+import com.javasnakes.Main
 
 import javax.swing.JPanel
 

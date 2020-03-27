@@ -43,8 +43,9 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+.gradle/
 .idea/
-*.iml
+build/
 
 # Temporary
-/src/com/JavaSnakes/io/
+/src/main/kotlin/com/JavaSnakes/io/

@@ -1,7 +1,9 @@
-package com.JavaSnakes.util
+package com.javasnakes.util
 
 import java.lang.RuntimeException
+import kotlinx.serialization.Serializable
 
+@Serializable
 class GridPos(var x: Int = 0, var y: Int = 0) {
     constructor(other: GridPos): this(other.x, other.y)
 
@@ -32,6 +34,7 @@ class GridPos(var x: Int = 0, var y: Int = 0) {
         }
     }
 
+    // Wraps position around to opposite side of board, if out of bounds
     private fun normalized(nextX: Int, nextY: Int): GridPos {
         val newX = Math.floorMod(nextX, boardW!!)
         val newY = Math.floorMod(nextY, boardH!!)

@@ -1,14 +1,14 @@
-package com.JavaSnakes.states.game
+package com.javasnakes.states.game
 
-import com.JavaSnakes.Board
-import com.JavaSnakes.Main
-import com.JavaSnakes.snakes.PlayerSnake
-import com.JavaSnakes.snakes.SnakeBase
-import com.JavaSnakes.util.Direction
-import com.JavaSnakes.util.GameState
-import com.JavaSnakes.util.asOrdinal
-import com.JavaSnakes.util.GridPos
-import com.JavaSnakes.util.MenuCard
+import com.javasnakes.Board
+import com.javasnakes.Main
+import com.javasnakes.snakes.PlayerSnake
+import com.javasnakes.snakes.SnakeBase
+import com.javasnakes.util.Direction
+import com.javasnakes.util.GameState
+import com.javasnakes.util.asOrdinal
+import com.javasnakes.util.GridPos
+import com.javasnakes.util.MenuCard
 
 import java.awt.CardLayout
 import java.awt.Color
@@ -105,7 +105,7 @@ class GamePanel(
         val scoreSet = scoreSortedSnakes.map { it.score }.toSet()
 
         val columnNames = arrayOf("Place", "Snake", "Score")
-        var data = mutableListOf<Array<String>>()
+        val data = mutableListOf<Array<String>>()
         for (snake in scoreSortedSnakes) {
             data.add(arrayOf(
                 (scoreSet.indexOf(snake.score) + 1).asOrdinal(),

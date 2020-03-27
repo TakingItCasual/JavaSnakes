@@ -1,9 +1,9 @@
-package com.JavaSnakes.snakes
+package com.javasnakes.snakes
 
-import com.JavaSnakes.Board
-import com.JavaSnakes.util.Direction
-import com.JavaSnakes.util.GridPos
-import com.JavaSnakes.util.Status
+import com.javasnakes.Board
+import com.javasnakes.util.Direction
+import com.javasnakes.util.GridPos
+import com.javasnakes.util.Status
 
 import java.awt.Color
 import java.util.Collections

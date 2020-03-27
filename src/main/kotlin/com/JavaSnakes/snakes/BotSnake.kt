@@ -1,9 +1,9 @@
-package com.JavaSnakes.snakes
+package com.javasnakes.snakes
 
 import java.awt.Color
 
-import com.JavaSnakes.util.Direction
-import com.JavaSnakes.util.GridPos
+import com.javasnakes.util.Direction
+import com.javasnakes.util.GridPos
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.abs
 

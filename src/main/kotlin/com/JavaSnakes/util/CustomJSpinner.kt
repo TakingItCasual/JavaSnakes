@@ -1,4 +1,4 @@
-package com.JavaSnakes.util
+package com.javasnakes.util
 
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
@@ -6,15 +6,15 @@ import javax.swing.JSpinner
 import javax.swing.JSpinner.DefaultEditor
 import javax.swing.SpinnerNumberModel
 
-class CustomJSpinner {
-    constructor(value: Int, min: Int?, max: Int?, stepSize: Int = 1) {
-        setModel(value, min, max, stepSize)
-    }
-
+class CustomJSpinner(value: Int, min: Int?, max: Int?, stepSize: Int = 1) {
     val spinner = JSpinner()
     var value: Int
         get() = spinner.value as Int
         set(value) { spinner.value = value }
+
+    init {
+        setModel(value, min, max, stepSize)
+    }
 
     fun setModel(value: Int, min: Int?, max: Int?, stepSize: Int = 1) {
         spinner.model = SpinnerNumberModel(value, min, max, stepSize)

@@ -1,7 +1,7 @@
-package com.JavaSnakes
+package com.javasnakes
 
-import com.JavaSnakes.states.menu.MenuPanel
-import com.JavaSnakes.util.GameState
+import com.javasnakes.states.menu.MenuPanel
+import com.javasnakes.util.GameState
 
 import java.util.Stack
 import javax.swing.JFrame

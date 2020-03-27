@@ -1,8 +1,8 @@
-package com.JavaSnakes.snakes
+package com.javasnakes.snakes
 
-import com.JavaSnakes.states.menu.PlayerSettings
-import com.JavaSnakes.util.Direction
-import com.JavaSnakes.util.GridPos
+import com.javasnakes.states.menu.PlayerSettings
+import com.javasnakes.util.Direction
+import com.javasnakes.util.GridPos
 
 import java.util.HashMap
 import java.util.concurrent.atomic.AtomicInteger

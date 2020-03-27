@@ -1,13 +1,13 @@
-package com.JavaSnakes.states.menu
+package com.javasnakes.states.menu
 
-import com.JavaSnakes.Main
-import com.JavaSnakes.states.game.GamePanel
-import com.JavaSnakes.states.game.InitSnakes
-import com.JavaSnakes.util.CustomJCheckBox
-import com.JavaSnakes.util.CustomJSpinner
-import com.JavaSnakes.util.GameState
-import com.JavaSnakes.util.GridPos
-import com.JavaSnakes.util.MenuCard
+import com.javasnakes.Main
+import com.javasnakes.states.game.GamePanel
+import com.javasnakes.states.game.InitSnakes
+import com.javasnakes.util.CustomJCheckBox
+import com.javasnakes.util.CustomJSpinner
+import com.javasnakes.util.GameState
+import com.javasnakes.util.GridPos
+import com.javasnakes.util.MenuCard
 
 import java.awt.CardLayout
 import java.awt.Dimension

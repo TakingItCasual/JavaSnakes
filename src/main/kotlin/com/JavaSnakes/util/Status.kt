@@ -1,4 +1,4 @@
-package com.JavaSnakes.util
+package com.javasnakes.util
 
 enum class Status {
     Alive,
